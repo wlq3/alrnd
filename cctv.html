@@ -8,21 +8,12 @@
 :root{--green:#32ff8a;--bg:#031c11;}
 *{margin:0;padding:0;box-sizing:border-box;font-family:"Courier New",monospace;}
 body{height:100vh;background:#000;display:flex;justify-content:center;align-items:center;overflow:hidden;}
-/* ── CRT 외곽(모서리 살짝 뒤로) ── */
-#monitor{
-  position:relative;
-  width:90vw;max-width:1000px;
-  height:70vh;max-height:700px;
-  background:var(--bg);border:14px solid #064;border-radius:18px;
-  box-shadow:0 0 140px #010 inset,0 0 14px #05f279,0 28px 80px rgba(0,0,0,.85);
-  overflow:hidden;
-  transform:perspective(1400px) rotateX(4deg) rotateY(-4deg); /* 네 모서리 후퇴 */
-}
+
 /* ── 볼록 CRT 화면 ── */
 #screen{
   position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
   color:var(--green);text-shadow:0 0 4px var(--green);
-  transform:perspective(1100px) translateZ(110px);            /* 중앙 더 볼록 */
+  transform:perspective(1100px) translateZ(110px);            
 }
 #screen::before{content:"";position:absolute;inset:0;
   background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px);
@@ -52,7 +43,7 @@ h2{font-size:3vmin;margin-bottom:4vmin;letter-spacing:2px;}
 
 <div id="monitor">
   <div id="screen" tabindex="0">
-    <h2>관리자 비밀번호를 입력하십시오</h2>
+    <h2>Enter the Password</h2>
     <div id="typed" class="blink"></div>
     <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
     <div id="msg"></div>
