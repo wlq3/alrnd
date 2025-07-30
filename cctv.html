@@ -2,13 +2,119 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>CCTV Dashboard – Placeholder</title>
+<title>Retro CRT Login</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
-body{margin:0;display:flex;justify-content:center;align-items:center;
-     height:100vh;background:#000;color:#0f0;font-family:"Courier New",monospace;font-size:28px;}
+:root{--green:#32ff8a;--bg:#031c11;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Courier New",monospace;}
+body{height:100vh;background:#000;display:flex;justify-content:center;align-items:center;overflow:hidden;}
+/* ── CRT 외곽(모서리 살짝 뒤로) ── */
+#monitor{
+  position:relative;
+  width:90vw;max-width:1000px;
+  height:70vh;max-height:700px;
+  background:var(--bg);border:14px solid #064;border-radius:18px;
+  box-shadow:0 0 140px #010 inset,0 0 14px #05f279,0 28px 80px rgba(0,0,0,.85);
+  overflow:hidden;
+  transform:perspective(1400px) rotateX(4deg) rotateY(-4deg); /* 네 모서리 후퇴 */
+}
+/* ── 볼록 CRT 화면 ── */
+#screen{
+  position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  color:var(--green);text-shadow:0 0 4px var(--green);
+  transform:perspective(1100px) translateZ(110px);            /* 중앙 더 볼록 */
+}
+#screen::before{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px);
+  mix-blend-mode:overlay;pointer-events:none;}
+#screen::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,transparent 0%,transparent 63%,rgba(0,0,0,.48) 100%);
+  pointer-events:none;}
+#noise{position:absolute;inset:-35%;
+  background-image:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGZpbHRlciBpZD0ibm9pc2UiPjxmZUZydWN0YWxOb2lzZSB0eXBlPSJ0dXJidWxlbmNlIiBiYXNlRnJlcXVlbmN5PSIuOSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgbnVtT2N0YXZlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBmaWxsPSIjRkZGIi8+PC9zdmc+");
+  opacity:.06;animation:noise 1s steps(5) infinite;pointer-events:none;}
+@keyframes noise{to{transform:translate(50%,50%);}}
+
+/* 텍스트 & 입력창 */
+h2{font-size:3vmin;margin-bottom:4vmin;letter-spacing:2px;}
+#typed{width:360px;max-width:60%;padding:6px 0;border-bottom:2px solid var(--green);
+  font-size:2.5vmin;min-height:42px;text-align:center;letter-spacing:2px;}
+.blink{animation:blink .8s step-end infinite;}
+@keyframes blink{50%{border-color:transparent;}}
+#msg{margin-top:32px;font-size:2.4vmin;min-height:30px;}
+#screen:focus{outline:none;}
+@keyframes glitch{0%{transform:translate(0,0);}20%{transform:translate(-1px,1px);}
+ 40%{transform:translate(1px,-1px);}60%{transform:translate(-1px,-1px);}
+ 80%{transform:translate(1px,1px);}100%{transform:translate(0,0);}}
 </style>
 </head>
 <body>
-CCTV 대시보드(테스트용)<br>로그인 성공 시 이 페이지로 이동합니다.
+
+<div id="monitor">
+  <div id="screen" tabindex="0">
+    <h2>관리자 비밀번호를 입력하십시오</h2>
+    <div id="typed" class="blink"></div>
+    <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
+    <div id="msg"></div>
+    <div id="noise"></div>
+  </div>
+</div>
+
+<script>
+/* ── CONFIG ── */
+const PASS="WATCHME";
+let buf="", ambience=false;
+/* AudioCtx */
+let ctx; function AC(){if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();return ctx;}
+
+/* ambience */
+function startAmbience(){
+  if(ambience) return; ambience=true;
+  const ac=AC();
+  /* Hum */
+  const hum=ac.createOscillator(), g1=ac.createGain();
+  hum.type="sine"; hum.frequency.value=50; g1.gain.value=.02;
+  hum.connect(g1).connect(ac.destination); hum.start();
+  /* White noise */
+  const sz=ac.sampleRate*2, buf=ac.createBuffer(1,sz,ac.sampleRate);
+  const d=buf.getChannelData(0); for(let i=0;i<sz;i++) d[i]=Math.random()*2-1;
+  const ns=ac.createBufferSource(); ns.buffer=buf; ns.loop=true;
+  const g2=ac.createGain(); g2.gain.value=.015;
+  ns.connect(g2).connect(ac.destination); ns.start();
+}
+
+/* 0.35s tone */
+function tone(freq,type){
+  const ac=AC(), o=ac.createOscillator(), g=ac.createGain();
+  o.type=type; o.frequency.value=freq; g.gain.value=.12;
+  o.connect(g).connect(ac.destination); o.start();
+  g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+.35);
+  o.stop(ac.currentTime+.36);
+}
+
+/* DOM */
+const screen=document.getElementById("screen"),typed=document.getElementById("typed"),msg=document.getElementById("msg");
+screen.addEventListener("keydown",e=>{
+  startAmbience();
+  e.preventDefault(); const k=e.key.toUpperCase();
+  if(k.length===1 && buf.length<PASS.length){buf+=k;typed.textContent=buf;}
+  else if(k==="BACKSPACE"&&buf){buf=buf.slice(0,-1);typed.textContent=buf;}
+  else if(k==="ENTER") validate();
+});
+screen.focus();
+
+function validate(){
+  if(buf===PASS){
+    msg.style.color="var(--green)";msg.textContent="ACCESS GRANTED";
+    typed.classList.remove("blink"); tone(440,"triangle");
+    setTimeout(()=>location.href="cctv.html",1400);
+  }else{
+    msg.style.color="#ff3242";msg.textContent="ACCESS DENIED";
+    screen.style.animation="glitch .28s 2"; tone(120,"sawtooth");
+    setTimeout(()=>{screen.style.animation="none";},600);
+    buf="";typed.textContent="";
+  }
+}
+</script>
 </body>
 </html>
