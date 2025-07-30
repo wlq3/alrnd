@@ -7,22 +7,37 @@
 <style>
 :root{--green:#32ff8a;--bg:#031c11;}
 *{margin:0;padding:0;box-sizing:border-box;font-family:"Courier New",monospace;}
-body{height:100vh;background:#000;display:flex;justify-content:center;align-items:center;overflow:hidden;}
+body{height:100vh;background:#000;display:flex;justify-content:center;align-items:center;overflow:hidden}
 
-/* ── 볼록 CRT 화면 ── */
+/* ── Pony Island식 둥근 베젤 ── */
+#cabinet{
+  width:90vw;max-width:1000px;height:70vh;max-height:700px;
+  background:#111;border-radius:80px;
+  box-shadow:0 0 40px #000 inset,0 0 60px #000;
+  display:flex;justify-content:center;align-items:center;
+}
+
+/* ── 유리판 ── */
+#monitor{
+  position:relative;width:97%;height:92%;background:var(--bg);
+  border-radius:50px;box-shadow:inset 0 0 140px #010;overflow:hidden;
+}
+
+/* ── CRT 화면(기울기 제거) ── */
 #screen{
   position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
   color:var(--green);text-shadow:0 0 4px var(--green);
-  transform:perspective(1100px) translateZ(110px);            
 }
+/* 스캔라인 + 비네팅 */
 #screen::before{content:"";position:absolute;inset:0;
   background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px);
   mix-blend-mode:overlay;pointer-events:none;}
 #screen::after{content:"";position:absolute;inset:0;
   background:radial-gradient(ellipse at center,transparent 0%,transparent 63%,rgba(0,0,0,.48) 100%);
   pointer-events:none;}
+/* 노이즈 */
 #noise{position:absolute;inset:-35%;
-  background-image:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGZpbHRlciBpZD0ibm9pc2UiPjxmZUZydWN0YWxOb2lzZSB0eXBlPSJ0dXJidWxlbmNlIiBiYXNlRnJlcXVlbmN5PSIuOSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgbnVtT2N0YXZlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBmaWxsPSIjRkZGIi8+PC9zdmc+");
+  background:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCI+PGZpbHRlciBpZD0iej48ZmVGcnVjdGFsTm9pc2UgdHlwZT0idHVyYnVsZW5jZSIgYmFzZUZyZXF1ZW5jeT0iLjkiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsdGVyPSJ1cmwoI3opIiBmaWxsPSIjRkZGIi8+PC9zdmc+");
   opacity:.06;animation:noise 1s steps(5) infinite;pointer-events:none;}
 @keyframes noise{to{transform:translate(50%,50%);}}
 
@@ -30,79 +45,50 @@ body{height:100vh;background:#000;display:flex;justify-content:center;align-item
 h2{font-size:3vmin;margin-bottom:4vmin;letter-spacing:2px;}
 #typed{width:360px;max-width:60%;padding:6px 0;border-bottom:2px solid var(--green);
   font-size:2.5vmin;min-height:42px;text-align:center;letter-spacing:2px;}
-.blink{animation:blink .8s step-end infinite;}
-@keyframes blink{50%{border-color:transparent;}}
 #msg{margin-top:32px;font-size:2.4vmin;min-height:30px;}
 #screen:focus{outline:none;}
-@keyframes glitch{0%{transform:translate(0,0);}20%{transform:translate(-1px,1px);}
- 40%{transform:translate(1px,-1px);}60%{transform:translate(-1px,-1px);}
- 80%{transform:translate(1px,1px);}100%{transform:translate(0,0);}}
+@keyframes glitch{0%{transform:none;}50%{transform:translate(1px,-1px);}100%{transform:none}}
 </style>
 </head>
 <body>
 
-<div id="monitor">
-  <div id="screen" tabindex="0">
-    <h2>Enter the Password</h2>
-    <div id="typed" class="blink"></div>
-    <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
-    <div id="msg"></div>
-    <div id="noise"></div>
+<div id="cabinet">
+  <div id="monitor">
+    <div id="screen" tabindex="0">
+      <h2>Enter the Password</h2>
+      <div id="typed"></div>
+      <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
+      <div id="msg"></div>
+      <div id="noise"></div>
+    </div>
   </div>
 </div>
 
 <script>
-/* ── CONFIG ── */
-const PASS="WATCHME";
-let buf="", ambience=false;
-/* AudioCtx */
-let ctx; function AC(){if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();return ctx;}
-
-/* ambience */
-function startAmbience(){
-  if(ambience) return; ambience=true;
-  const ac=AC();
-  /* Hum */
-  const hum=ac.createOscillator(), g1=ac.createGain();
-  hum.type="sine"; hum.frequency.value=50; g1.gain.value=.02;
-  hum.connect(g1).connect(ac.destination); hum.start();
-  /* White noise */
-  const sz=ac.sampleRate*2, buf=ac.createBuffer(1,sz,ac.sampleRate);
-  const d=buf.getChannelData(0); for(let i=0;i<sz;i++) d[i]=Math.random()*2-1;
-  const ns=ac.createBufferSource(); ns.buffer=buf; ns.loop=true;
-  const g2=ac.createGain(); g2.gain.value=.015;
-  ns.connect(g2).connect(ac.destination); ns.start();
-}
-
-/* 0.35s tone */
-function tone(freq,type){
-  const ac=AC(), o=ac.createOscillator(), g=ac.createGain();
-  o.type=type; o.frequency.value=freq; g.gain.value=.12;
-  o.connect(g).connect(ac.destination); o.start();
-  g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+.35);
-  o.stop(ac.currentTime+.36);
-}
-
-/* DOM */
-const screen=document.getElementById("screen"),typed=document.getElementById("typed"),msg=document.getElementById("msg");
-screen.addEventListener("keydown",e=>{
-  startAmbience();
-  e.preventDefault(); const k=e.key.toUpperCase();
-  if(k.length===1 && buf.length<PASS.length){buf+=k;typed.textContent=buf;}
-  else if(k==="BACKSPACE"&&buf){buf=buf.slice(0,-1);typed.textContent=buf;}
-  else if(k==="ENTER") validate();
+const PASS="WATCHME";let buf="",amb=false;
+let ctx;const AC=()=>ctx||(ctx=new(window.AudioContext||window.webkitAudioContext));
+function tone(f,t){const a=AC(),o=a.createOscillator(),g=a.createGain();
+  o.type=t;o.frequency.value=f;g.gain.value=.12;o.connect(g).connect(a.destination);
+  o.start();g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+.35);o.stop(a.currentTime+.36);}
+function ambStart(){if(amb)return;amb=true;const a=AC(),h=a.createOscillator(),g=a.createGain();
+  h.type="sine";h.frequency.value=50;g.gain.value=.02;h.connect(g).connect(a.destination);h.start();
+  const s=a.sampleRate*2,b=a.createBuffer(1,s,a.sampleRate),d=b.getChannelData(0);
+  for(let i=0;i<s;i++)d[i]=Math.random()*2-1;
+  const n=a.createBufferSource(),ng=a.createGain();n.buffer=b;n.loop=true;ng.gain.value=.015;
+  n.connect(ng).connect(a.destination);n.start();}
+const typed=document.getElementById("typed"),msg=document.getElementById("msg");
+document.addEventListener("keydown",e=>{
+  ambStart();const k=e.key.toUpperCase();
+  if(k==="BACKSPACE"){e.preventDefault();buf=buf.slice(0,-1);typed.textContent=buf;return;}
+  if(k==="ENTER"){e.preventDefault();check();return;}
+  if(k.length===1&&buf.length<PASS.length){buf+=k;typed.textContent=buf;}
 });
-screen.focus();
-
-function validate(){
+function check(){
   if(buf===PASS){
-    msg.style.color="var(--green)";msg.textContent="ACCESS GRANTED";
-    typed.classList.remove("blink"); tone(440,"triangle");
+    msg.style.color="var(--green)";msg.textContent="ACCESS GRANTED";tone(440,"triangle");
     setTimeout(()=>location.href="cctv.html",1400);
   }else{
-    msg.style.color="#ff3242";msg.textContent="ACCESS DENIED";
-    screen.style.animation="glitch .28s 2"; tone(120,"sawtooth");
-    setTimeout(()=>{screen.style.animation="none";},600);
+    msg.style.color="#f44";msg.textContent="ACCESS DENIED";tone(120,"sawtooth");
     buf="";typed.textContent="";
   }
 }
