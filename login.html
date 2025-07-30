@@ -2,45 +2,59 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>Retro CRT Login</title>
+<title>Retro CRT Login</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
 :root{--green:#32ff8a;--bg:#031c11;}
 *{margin:0;padding:0;box-sizing:border-box;font-family:"Courier New",monospace;}
-body{height:100vh;background:#000;display:flex;justify-content:center;align-items:center;
-     perspective:900px;overflow:hidden;}
-/* ── CRT 모니터 ─────────────────── */
+body{
+  height:100vh;background:#000;display:flex;justify-content:center;align-items:center;
+  overflow:hidden;
+}
+/* ── CRT 모니터 껍데기 ───────────────────────── */
 #monitor{
   position:relative;width:80vw;max-width:820px;height:60vh;max-height:620px;
-  background:var(--bg);color:var(--green);
-  display:flex;flex-direction:column;justify-content:center;align-items:center;
-  border:12px solid #064;border-radius:14px;
+  background:var(--bg);border:12px solid #064;border-radius:14px;
   box-shadow:0 0 120px #010 inset,0 0 12px #05f279,0 20px 60px rgba(0,0,0,.85);
-  transform:perspective(800px) rotateX(4deg) rotateY(-5deg) translateZ(-60px);
-  text-shadow:0 0 4px var(--green);overflow:hidden;
+  overflow:hidden;
+}
+/* ── 실제 화면 영역(볼록) ─────────────────────── */
+#screen{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:var(--green);
+  text-shadow:0 0 4px var(--green);
+  transform:perspective(900px) translateZ(70px); /* 중앙 볼록 */
 }
 /* 스캔라인 */
-#monitor::before{content:"";position:absolute;inset:0;
+#screen::before{
+  content:"";position:absolute;inset:0;
   background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px);
-  mix-blend-mode:overlay;pointer-events:none;}
-/* 비네팅(곡면) */
-#monitor::after{content:"";position:absolute;inset:0;
+  mix-blend-mode:overlay;pointer-events:none;
+}
+/* 비네팅(모서리 어둡게) */
+#screen::after{
+  content:"";position:absolute;inset:0;
   background:radial-gradient(ellipse at center,transparent 0%,transparent 65%,rgba(0,0,0,.45) 100%);
-  pointer-events:none;}
-/* 노이즈 */
-#noise{position:absolute;inset:-40%;
+  pointer-events:none;
+}
+/* 노이즈 오버레이 */
+#noise{
+  position:absolute;inset:-35%;
   background-image:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGZpbHRlciBpZD0ibm9pc2UiPjxmZUZydWN0YWxOb2lzZSB0eXBlPSJ0dXJidWxlbmNlIiBiYXNlRnJlcXVlbmN5PSIuOSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgbnVtT2N0YXZlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBmaWxsPSIjRkZGIi8+PC9zdmc+");
-  opacity:.06;animation:noise 1s steps(5) infinite;pointer-events:none;}
+  opacity:.06;animation:noise 1s steps(5) infinite;pointer-events:none;
+}
 @keyframes noise{to{transform:translate(50%,50%);}}
 
 /* 텍스트 & 입력창 */
-h2{font-size:3.2vmin;margin-bottom:4vmin;letter-spacing:2px;transform:translateZ(20px);}
-#typed{width:320px;max-width:60%;padding:6px 0;border-bottom:2px solid var(--green);
-  font-size:2.6vmin;min-height:38px;text-align:center;letter-spacing:2px;transform:translateZ(15px);}
+h2{font-size:3.2vmin;margin-bottom:4vmin;letter-spacing:2px;}
+#typed{
+  width:320px;max-width:60%;padding:6px 0;border-bottom:2px solid var(--green);
+  font-size:2.6vmin;min-height:38px;text-align:center;letter-spacing:2px;
+}
 .blink{animation:blink .8s step-end infinite;}
 @keyframes blink{50%{border-color:transparent;}}
-#msg{margin-top:30px;font-size:2.4vmin;min-height:28px;transform:translateZ(18px);}
-#monitor:focus{outline:none;}
+#msg{margin-top:30px;font-size:2.4vmin;min-height:28px;}
+#screen:focus{outline:none;}
 
 @keyframes glitch{0%{transform:translate(0,0);}20%{transform:translate(-1px,1px);}
 40%{transform:translate(1px,-1px);}60%{transform:translate(-1px,-1px);}
@@ -48,77 +62,91 @@ h2{font-size:3.2vmin;margin-bottom:4vmin;letter-spacing:2px;transform:translateZ
 </style>
 </head>
 <body>
-<div id="monitor" tabindex="0">
-  <h2>관리자 비밀번호를 입력하십시오</h2>
-  <div id="typed" class="blink"></div>
-  <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
-  <div id="msg"></div>
-  <div id="noise"></div>
+
+<div id="monitor">
+  <div id="screen" tabindex="0">
+    <h2>관리자 비밀번호를 입력하십시오</h2>
+    <div id="typed" class="blink"></div>
+    <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
+    <div id="msg"></div>
+    <div id="noise"></div>
+  </div>
 </div>
 
 <script>
-/* ── 설정 값 ───────────────────── */
+/* ── 설정 ─────────────────────────── */
 const PASS="WATCHME";
 const typed=document.getElementById("typed");
 const msg=document.getElementById("msg");
-let buf="";
+const screen=document.getElementById("screen");
+let buf="", ambienceStarted=false;
 
-/* ── 공통 오디오 컨텍스트 ───────── */
+/* ── 오디오 셋업 ───────────────────── */
 let ctx;
-function ensureCtx(){
-  if(!ctx){ctx=new (window.AudioContext||window.webkitAudioContext)();}
-  return ctx;
-}
+function ensureCtx(){if(!ctx){ctx=new (window.AudioContext||window.webkitAudioContext)();}return ctx;}
 
-/* ── 타자음(click) ──────────────── */
+/* 타자음 */
 function keyFX(){
   const ac=ensureCtx();
-  const osc=ac.createOscillator();const g=ac.createGain();
-  osc.type="square";osc.frequency.value=440;
-  g.gain.value=.05;osc.connect(g).connect(ac.destination);
-  osc.start();g.gain.exponentialRampToValueAtTime(0,ac.currentTime+.04);
-  osc.stop(ac.currentTime+.05);
+  const osc=ac.createOscillator(), g=ac.createGain();
+  osc.type="square";osc.frequency.value=440;g.gain.value=.05;
+  osc.connect(g).connect(ac.destination);osc.start();
+  g.gain.exponentialRampToValueAtTime(0,ac.currentTime+.04);osc.stop(ac.currentTime+.05);
+  startAmbience();
 }
 
-/* ── 오류음(buzz) ──────────────── */
+/* 오류(웅-) */
 function errorFX(){
   const ac=ensureCtx();
-  const osc=ac.createOscillator();const g=ac.createGain();
-  osc.type="sawtooth";osc.frequency.value=120;     /* 낮고 거친 톤 */
-  g.gain.value=.12;osc.connect(g).connect(ac.destination);
-  osc.start();g.gain.exponentialRampToValueAtTime(0,ac.currentTime+.35);
-  osc.stop(ac.currentTime+.36);
+  const osc=ac.createOscillator(), g=ac.createGain();
+  osc.type="sawtooth";osc.frequency.value=120;g.gain.value=.14;
+  osc.connect(g).connect(ac.destination);osc.start();
+  g.gain.exponentialRampToValueAtTime(0,ac.currentTime+.35);osc.stop(ac.currentTime+.36);
 }
 
-/* ── 입력 처리 ─────────────────── */
-const monitor=document.getElementById("monitor");
-monitor.addEventListener("keydown",e=>{
+/* 배경 우웅+노이즈 루프 */
+function startAmbience(){
+  if(ambienceStarted) return;
+  const ac=ensureCtx();
+  /* ① 저주파 Hum */
+  const hum=ac.createOscillator(), humGain=ac.createGain();
+  hum.type="sine";hum.frequency.value=50;humGain.gain.value=.02;
+  hum.connect(humGain).connect(ac.destination);hum.start();
+  /* ② 화이트 노이즈 */
+  const bufferSize=2*ac.sampleRate;
+  const noiseBuf=ac.createBuffer(1,bufferSize,ac.sampleRate);
+  const data=noiseBuf.getChannelData(0);
+  for(let i=0;i<bufferSize;i++){data[i]=Math.random()*2-1;}
+  const noise=ac.createBufferSource();noise.buffer=noiseBuf;noise.loop=true;
+  const nGain=ac.createGain();nGain.gain.value=.015;
+  noise.connect(nGain).connect(ac.destination);noise.start();
+  ambienceStarted=true;
+}
+
+/* ── 입력 처리 ───────────────────── */
+screen.addEventListener("keydown",e=>{
   e.preventDefault();
   const k=e.key;
   if(k.length===1 && buf.length<PASS.length){
-    buf+=k.toUpperCase();
-    typed.textContent=buf; keyFX();
+    buf+=k.toUpperCase();typed.textContent=buf;keyFX();
   }else if(k==="Backspace" && buf){
-    buf=buf.slice(0,-1); typed.textContent=buf; keyFX();
+    buf=buf.slice(0,-1);typed.textContent=buf;keyFX();
   }else if(k==="Enter"){validate();}
 });
-monitor.focus();
+screen.focus();
 
 function validate(){
   if(buf===PASS){
-    msg.style.color="var(--green)"; msg.textContent="ACCESS GRANTED";
+    msg.style.color="var(--green)";msg.textContent="ACCESS GRANTED";
     typed.classList.remove("blink");
     setTimeout(()=>location.href="cctv.html",1400);
   }else{
-    msg.style.color="#ff3242"; msg.textContent="ACCESS DENIED";
-    monitor.style.animation="glitch .28s 2";
-    errorFX();                              // << 경고음 호출
-    setTimeout(()=>{monitor.style.animation="none";},600);
-    buf=""; typed.textContent="";
+    msg.style.color="#ff3242";msg.textContent="ACCESS DENIED";
+    screen.style.animation="glitch .28s 2";errorFX();
+    setTimeout(()=>{screen.style.animation="none";},600);
+    buf="";typed.textContent="";
   }
 }
 </script>
 </body>
 </html>
-
-
