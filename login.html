@@ -7,58 +7,45 @@
 <style>
 :root{--green:#32ff8a;--bg:#031c11;}
 *{margin:0;padding:0;box-sizing:border-box;font-family:"Courier New",monospace;}
-body{
-  height:100vh;background:#000;display:flex;justify-content:center;align-items:center;
-  overflow:hidden;
-}
-/* ── CRT 모니터 껍데기 ───────────────────────── */
+body{height:100vh;background:#000;display:flex;justify-content:center;align-items:center;overflow:hidden;}
+/* ── CRT 외곽(모서리 살짝 뒤로) ── */
 #monitor{
-  position:relative;width:80vw;max-width:820px;height:60vh;max-height:620px;
-  background:var(--bg);border:12px solid #064;border-radius:14px;
-  box-shadow:0 0 120px #010 inset,0 0 12px #05f279,0 20px 60px rgba(0,0,0,.85);
+  position:relative;
+  width:90vw;max-width:1000px;
+  height:70vh;max-height:700px;
+  background:var(--bg);border:14px solid #064;border-radius:18px;
+  box-shadow:0 0 140px #010 inset,0 0 14px #05f279,0 28px 80px rgba(0,0,0,.85);
   overflow:hidden;
+  transform:perspective(1400px) rotateX(4deg) rotateY(-4deg); /* 네 모서리 후퇴 */
 }
-/* ── 실제 화면 영역(볼록) ─────────────────────── */
+/* ── 볼록 CRT 화면 ── */
 #screen{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;color:var(--green);
-  text-shadow:0 0 4px var(--green);
-  transform:perspective(900px) translateZ(70px); /* 중앙 볼록 */
+  position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  color:var(--green);text-shadow:0 0 4px var(--green);
+  transform:perspective(1100px) translateZ(110px);            /* 중앙 더 볼록 */
 }
-/* 스캔라인 */
-#screen::before{
-  content:"";position:absolute;inset:0;
+#screen::before{content:"";position:absolute;inset:0;
   background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px);
-  mix-blend-mode:overlay;pointer-events:none;
-}
-/* 비네팅(모서리 어둡게) */
-#screen::after{
-  content:"";position:absolute;inset:0;
-  background:radial-gradient(ellipse at center,transparent 0%,transparent 65%,rgba(0,0,0,.45) 100%);
-  pointer-events:none;
-}
-/* 노이즈 오버레이 */
-#noise{
-  position:absolute;inset:-35%;
+  mix-blend-mode:overlay;pointer-events:none;}
+#screen::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,transparent 0%,transparent 63%,rgba(0,0,0,.48) 100%);
+  pointer-events:none;}
+#noise{position:absolute;inset:-35%;
   background-image:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGZpbHRlciBpZD0ibm9pc2UiPjxmZUZydWN0YWxOb2lzZSB0eXBlPSJ0dXJidWxlbmNlIiBiYXNlRnJlcXVlbmN5PSIuOSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgbnVtT2N0YXZlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWx0ZXI9InVybCgjbm9pc2UpIiBmaWxsPSIjRkZGIi8+PC9zdmc+");
-  opacity:.06;animation:noise 1s steps(5) infinite;pointer-events:none;
-}
+  opacity:.06;animation:noise 1s steps(5) infinite;pointer-events:none;}
 @keyframes noise{to{transform:translate(50%,50%);}}
 
 /* 텍스트 & 입력창 */
-h2{font-size:3.2vmin;margin-bottom:4vmin;letter-spacing:2px;}
-#typed{
-  width:320px;max-width:60%;padding:6px 0;border-bottom:2px solid var(--green);
-  font-size:2.6vmin;min-height:38px;text-align:center;letter-spacing:2px;
-}
+h2{font-size:3vmin;margin-bottom:4vmin;letter-spacing:2px;}
+#typed{width:360px;max-width:60%;padding:6px 0;border-bottom:2px solid var(--green);
+  font-size:2.5vmin;min-height:42px;text-align:center;letter-spacing:2px;}
 .blink{animation:blink .8s step-end infinite;}
 @keyframes blink{50%{border-color:transparent;}}
-#msg{margin-top:30px;font-size:2.4vmin;min-height:28px;}
+#msg{margin-top:32px;font-size:2.4vmin;min-height:30px;}
 #screen:focus{outline:none;}
-
 @keyframes glitch{0%{transform:translate(0,0);}20%{transform:translate(-1px,1px);}
-40%{transform:translate(1px,-1px);}60%{transform:translate(-1px,-1px);}
-80%{transform:translate(1px,1px);}100%{transform:translate(0,0);}}
+ 40%{transform:translate(1px,-1px);}60%{transform:translate(-1px,-1px);}
+ 80%{transform:translate(1px,1px);}100%{transform:translate(0,0);}}
 </style>
 </head>
 <body>
@@ -74,75 +61,56 @@ h2{font-size:3.2vmin;margin-bottom:4vmin;letter-spacing:2px;}
 </div>
 
 <script>
-/* ── 설정 ─────────────────────────── */
+/* ── CONFIG ── */
 const PASS="WATCHME";
-const typed=document.getElementById("typed");
-const msg=document.getElementById("msg");
-const screen=document.getElementById("screen");
-let buf="", ambienceStarted=false;
+let buf="", ambience=false;
+/* AudioCtx */
+let ctx; function AC(){if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();return ctx;}
 
-/* ── 오디오 셋업 ───────────────────── */
-let ctx;
-function ensureCtx(){if(!ctx){ctx=new (window.AudioContext||window.webkitAudioContext)();}return ctx;}
-
-/* 타자음 */
-function keyFX(){
-  const ac=ensureCtx();
-  const osc=ac.createOscillator(), g=ac.createGain();
-  osc.type="square";osc.frequency.value=440;g.gain.value=.05;
-  osc.connect(g).connect(ac.destination);osc.start();
-  g.gain.exponentialRampToValueAtTime(0,ac.currentTime+.04);osc.stop(ac.currentTime+.05);
-  startAmbience();
-}
-
-/* 오류(웅-) */
-function errorFX(){
-  const ac=ensureCtx();
-  const osc=ac.createOscillator(), g=ac.createGain();
-  osc.type="sawtooth";osc.frequency.value=120;g.gain.value=.14;
-  osc.connect(g).connect(ac.destination);osc.start();
-  g.gain.exponentialRampToValueAtTime(0,ac.currentTime+.35);osc.stop(ac.currentTime+.36);
-}
-
-/* 배경 우웅+노이즈 루프 */
+/* ambience */
 function startAmbience(){
-  if(ambienceStarted) return;
-  const ac=ensureCtx();
-  /* ① 저주파 Hum */
-  const hum=ac.createOscillator(), humGain=ac.createGain();
-  hum.type="sine";hum.frequency.value=50;humGain.gain.value=.02;
-  hum.connect(humGain).connect(ac.destination);hum.start();
-  /* ② 화이트 노이즈 */
-  const bufferSize=2*ac.sampleRate;
-  const noiseBuf=ac.createBuffer(1,bufferSize,ac.sampleRate);
-  const data=noiseBuf.getChannelData(0);
-  for(let i=0;i<bufferSize;i++){data[i]=Math.random()*2-1;}
-  const noise=ac.createBufferSource();noise.buffer=noiseBuf;noise.loop=true;
-  const nGain=ac.createGain();nGain.gain.value=.015;
-  noise.connect(nGain).connect(ac.destination);noise.start();
-  ambienceStarted=true;
+  if(ambience) return; ambience=true;
+  const ac=AC();
+  /* Hum */
+  const hum=ac.createOscillator(), g1=ac.createGain();
+  hum.type="sine"; hum.frequency.value=50; g1.gain.value=.02;
+  hum.connect(g1).connect(ac.destination); hum.start();
+  /* White noise */
+  const sz=ac.sampleRate*2, buf=ac.createBuffer(1,sz,ac.sampleRate);
+  const d=buf.getChannelData(0); for(let i=0;i<sz;i++) d[i]=Math.random()*2-1;
+  const ns=ac.createBufferSource(); ns.buffer=buf; ns.loop=true;
+  const g2=ac.createGain(); g2.gain.value=.015;
+  ns.connect(g2).connect(ac.destination); ns.start();
 }
 
-/* ── 입력 처리 ───────────────────── */
+/* 0.35s tone */
+function tone(freq,type){
+  const ac=AC(), o=ac.createOscillator(), g=ac.createGain();
+  o.type=type; o.frequency.value=freq; g.gain.value=.12;
+  o.connect(g).connect(ac.destination); o.start();
+  g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+.35);
+  o.stop(ac.currentTime+.36);
+}
+
+/* DOM */
+const screen=document.getElementById("screen"),typed=document.getElementById("typed"),msg=document.getElementById("msg");
 screen.addEventListener("keydown",e=>{
-  e.preventDefault();
-  const k=e.key;
-  if(k.length===1 && buf.length<PASS.length){
-    buf+=k.toUpperCase();typed.textContent=buf;keyFX();
-  }else if(k==="Backspace" && buf){
-    buf=buf.slice(0,-1);typed.textContent=buf;keyFX();
-  }else if(k==="Enter"){validate();}
+  startAmbience();
+  e.preventDefault(); const k=e.key.toUpperCase();
+  if(k.length===1 && buf.length<PASS.length){buf+=k;typed.textContent=buf;}
+  else if(k==="BACKSPACE"&&buf){buf=buf.slice(0,-1);typed.textContent=buf;}
+  else if(k==="ENTER") validate();
 });
 screen.focus();
 
 function validate(){
   if(buf===PASS){
     msg.style.color="var(--green)";msg.textContent="ACCESS GRANTED";
-    typed.classList.remove("blink");
+    typed.classList.remove("blink"); tone(440,"triangle");
     setTimeout(()=>location.href="cctv.html",1400);
   }else{
     msg.style.color="#ff3242";msg.textContent="ACCESS DENIED";
-    screen.style.animation="glitch .28s 2";errorFX();
+    screen.style.animation="glitch .28s 2"; tone(120,"sawtooth");
     setTimeout(()=>{screen.style.animation="none";},600);
     buf="";typed.textContent="";
   }
