@@ -1,112 +1,79 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<title>CRT Terminal Login</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<style>
-:root{--green:#32ff8a;--bg:#031c11;}
-*{margin:0;padding:0;box-sizing:border-box;
-  font-family:'Press Start 2P',Courier,monospace;
-/* 드래그 차단 */
-  user-select:none;-webkit-user-select:none;-ms-user-select:none;}
-body{
-  height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;
-  background:#000;
-/* 고정 CRT 무늬(배경 전체) */
-  background-image:
-    repeating-linear-gradient(
-      rgba(0,0,0,.6) 0 4px,
-      rgba(0,0,0,.8) 4px 8px);
-}
-
-/* ── 둥근 베젤 ── */
-#cabinet{
-  width:90vw;max-width:1000px;height:70vh;max-height:700px;background:#111;
-  border-radius:80px;box-shadow:0 0 40px #000 inset,0 0 60px #000;
-  display:flex;justify-content:center;align-items:center;
-}
-
-/* ── 유리판 ── */
-#monitor{
-  position:relative;width:97%;height:92%;background:var(--bg);
-  border-radius:50px;box-shadow:inset 0 0 140px #010;overflow:hidden;
-}
-
-/* ── 화면 ── */
-#screen{
-  position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
-  color:var(--green);text-shadow:0 0 4px var(--green);
-}
-
-/* 스캔라인 + 비네팅 */
-#screen::before{content:"";position:absolute;inset:0;
-  background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px);
-  mix-blend-mode:overlay;pointer-events:none;}
-#screen::after{content:"";position:absolute;inset:0;
-  background:radial-gradient(ellipse at center,transparent 0%,transparent 63%,rgba(0,0,0,.48) 100%);
-  pointer-events:none;}
-
-/* 노이즈 */
-#noise{
-  position:absolute;inset:-35%;
-  background:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCI+PGZpbHRlciBpZD0iej48ZmVGcnVjdGFsTm9pc2UgdHlwZT0idHVyYnVsZW5jZSIgYmFzZUZyZXF1ZW5jeT0iLjkiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsdGVyPSJ1cmwoI3opIiBmaWxsPSIjRkZGIi8+PC9zdmc+");
-  opacity:.05;animation:noise 1s steps(5) infinite;pointer-events:none;}
-@keyframes noise{to{transform:translate(50%,50%);}}
-
-/* 입력/메시지 */
-h2{font-size:2.1vmin;margin-bottom:3vmin;}
-#typed{width:360px;max-width:60%;padding:6px 0;border-bottom:2px solid var(--green);
-  font-size:2vmin;min-height:38px;text-align:center;letter-spacing:2px;}
-#msg{margin-top:30px;font-size:2vmin;min-height:28px;color:#f44;}
-@keyframes glitch{0%,100%{transform:none;}50%{transform:translate(1px,-1px);}}
-
-/* 노커서 깜빡임 제거 – caret 숨김 */
-input{caret-color:transparent;}
-</style>
-</head>
-<body>
-
-<div id="cabinet">
-  <div id="monitor">
-    <div id="screen">
-      <h2>ENTER THE PASSWORD</h2>
-      <div id="typed"></div>
-      <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
-      <div id="msg"></div>
-      <div id="noise"></div>
-    </div>
-  </div>
-</div>
-
+<!-- ▽ 기존 <script> 구간만 교체 ▽ -->
 <script>
-const PASS="WATCHME";let buf="",amb=false;
-let ctx;const AC=()=>ctx||(ctx=new(window.AudioContext||window.webkitAudioContext));
-function tone(f,t){const a=AC(),o=a.createOscillator(),g=a.createGain();
-  o.type=t;o.frequency.value=f;g.gain.value=.12;o.connect(g).connect(a.destination);
-  o.start();g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+.35);o.stop(a.currentTime+.36);}
-function amb(){if(amb)return;amb=true;
-  const a=AC(),h=a.createOscillator(),g=a.createGain();
-  h.type="sine";h.frequency.value=50;g.gain.value=.02;h.connect(g).connect(a.destination);h.start();}
-const typed=document.getElementById("typed"),msg=document.getElementById("msg");
-document.addEventListener("keydown",e=>{
-  amb();const k=e.key.toUpperCase();
-  if(k==="BACKSPACE"){e.preventDefault();buf=buf.slice(0,-1);typed.textContent=buf;return;}
-  if(k==="ENTER"){e.preventDefault();chk();return;}
-  if(k.length===1&&buf.length<PASS.length){buf+=k;typed.textContent=buf;}
+const PASS = "WATCHME";
+let buf = "", ambienceStarted = false;   /* 불린 변수 이름 변경 */
+
+let ctx;
+const AC = () => ctx || (ctx = new (window.AudioContext || window.webkitAudioContext));
+
+function tone(freq, type){
+  const ac = AC(), osc = ac.createOscillator(), g = ac.createGain();
+  osc.type = type; osc.frequency.value = freq; g.gain.value = .12;
+  osc.connect(g).connect(ac.destination);
+  osc.start();
+  g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + .35);
+  osc.stop(ac.currentTime + .36);
+}
+
+/* 배경 Hum + 화이트노이즈 */
+function startAmbience(){
+  if (ambienceStarted) return;
+  ambienceStarted = true;
+  const ac = AC();
+
+  // Hum
+  const hum = ac.createOscillator(), hg = ac.createGain();
+  hum.type = "sine"; hum.frequency.value = 50; hg.gain.value = .02;
+  hum.connect(hg).connect(ac.destination); hum.start();
+
+  // White noise
+  const size = ac.sampleRate * 2,
+        bufN = ac.createBuffer(1, size, ac.sampleRate),
+        data = bufN.getChannelData(0);
+  for (let i = 0; i < size; i++) data[i] = Math.random() * 2 - 1;
+  const noise = ac.createBufferSource(), ng = ac.createGain();
+  noise.buffer = bufN; noise.loop = true; ng.gain.value = .015;
+  noise.connect(ng).connect(ac.destination); noise.start();
+}
+
+const typed = document.getElementById("typed"),
+      msg   = document.getElementById("msg");
+
+document.addEventListener("keydown", (e) => {
+  startAmbience();
+  const k = e.key;
+
+  if (k === "Backspace") {
+    e.preventDefault();
+    buf = buf.slice(0, -1); typed.textContent = buf;
+    return;
+  }
+
+  if (k === "Enter") {
+    e.preventDefault();
+    check();
+    return;
+  }
+
+  if (k.length === 1 && buf.length < PASS.length) {
+    buf += k.toUpperCase();
+    typed.textContent = buf;
+  }
 });
-function chk(){
-  if(buf===PASS){
-    msg.style.color="var(--green)";msg.textContent="ACCESS GRANTED";tone(440,"triangle");
-    setTimeout(()=>location.href="cctv.html",1400);
-  }else{
-    msg.style.color="#f44";msg.textContent="ACCESS DENIED";tone(120,"sawtooth");
-    document.getElementById("screen").style.animation="glitch .35s 2";
-    setTimeout(()=>{document.getElementById("screen").style.animation="none";},700);
-    buf="";typed.textContent="";
+
+function check(){
+  if (buf === PASS){
+    msg.style.color = "var(--green)";
+    msg.textContent = "ACCESS GRANTED";
+    tone(440, "triangle");
+    setTimeout(()=>location.href="cctv.html", 1400);
+  } else {
+    msg.style.color = "#f44";
+    msg.textContent = "ACCESS DENIED";
+    tone(120, "sawtooth");
+    document.getElementById("screen").style.animation = "glitch .35s 2";
+    setTimeout(()=>document.getElementById("screen").style.animation = "none", 700);
+    buf = ""; typed.textContent = "";
   }
 }
 </script>
-</body>
-</html>
