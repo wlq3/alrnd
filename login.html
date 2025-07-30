@@ -1,4 +1,3 @@
-cat > retro_login.html << 'EOF'
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -36,7 +35,7 @@ h2{font-size:30px;margin-bottom:30px;letter-spacing:2px;transform:translateZ(30p
 </head>
 <body>
 <div id="monitor" tabindex="0">
-  <h2>관리자 비밀번호를 입력하십시오</h2>
+  <h2>Enter the Password</h2>
   <div id="typed" class="blink"></div>
   <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
   <div id="msg"></div>
@@ -84,9 +83,7 @@ function validate(){
 </script>
 </body>
 </html>
-EOF
 
-cat > cctv.html << 'EOF'
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -101,4 +98,3 @@ body{margin:0;display:flex;justify-content:center;align-items:center;
 CCTV 대시보드(테스트용)<br>로그인 성공 시 이 페이지로 이동합니다.
 </body>
 </html>
-EOF
