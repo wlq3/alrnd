@@ -1,0 +1,104 @@
+cat > retro_login.html << 'EOF'
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Retro CCTV Login – 3D</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--green:#32ff8a;--bg:#031c11;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Courier New",monospace;}
+body{height:100vh;background:#000;display:flex;justify-content:center;align-items:center;perspective:1200px;overflow:hidden;}
+#monitor{position:relative;width:640px;height:480px;background:var(--bg);color:var(--green);
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  border:10px solid #064;border-radius:14px;box-shadow:0 0 60px #011 inset,0 20px 80px #010;
+  transform-style:preserve-3d;animation:float 9s ease-in-out infinite;text-shadow:0 0 4px var(--green);}
+@keyframes float{0%,100%{transform:rotateX(-7deg) rotateY(-4deg) translateY(-4px);}
+ 50%{transform:rotateX(6deg) rotateY(5deg) translateY(4px);}}
+#monitor::before{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.25) 2px 3px);
+  mix-blend-mode:overlay;pointer-events:none;}
+#monitor::after{content:"";position:absolute;inset:-50%;
+  background-image:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGZpbHRlciBpZD0iZ1IiPjxmZUZydWN0YWxOb2lzZSB0eXBlPSJ0dXJidWxlbmNlIiBiYXNlRnJlcXVlbmN5PSIuOSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgbnVtT2N0YXZlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWx0ZXI9InVybCgjZ1IpIiBmaWxsPSIjRkZGIi8+PC9zdmc+");
+  animation:noise 1s steps(5) infinite;opacity:.06;pointer-events:none;}
+@keyframes noise{to{transform:translate(50%,50%);}}
+h2{font-size:30px;margin-bottom:30px;letter-spacing:2px;transform:translateZ(30px);}
+#typed{width:300px;padding:6px 0;border-bottom:2px solid var(--green);
+  font-size:24px;text-align:center;letter-spacing:2px;transform:translateZ(20px);}
+.blink{animation:blink .8s step-end infinite;}
+@keyframes blink{50%{border-color:transparent;}}
+#msg{margin-top:26px;font-size:20px;min-height:26px;transform:translateZ(25px);}
+#monitor:focus{outline:none;}
+@keyframes glitch{0%{transform:translate(0,0);}20%{transform:translate(-1px,1px);}
+ 40%{transform:translate(1px,-1px);}60%{transform:translate(-1px,-1px);}
+ 80%{transform:translate(1px,1px);}100%{transform:translate(0,0);}}
+</style>
+</head>
+<body>
+<div id="monitor" tabindex="0">
+  <h2>관리자 비밀번호를 입력하십시오</h2>
+  <div id="typed" class="blink"></div>
+  <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
+  <div id="msg"></div>
+</div>
+<script>
+const PASS="WATCHME";
+const typed=document.getElementById("typed");
+const msg=document.getElementById("msg");
+let buf="";
+let ctx,osc,gain;
+function keyFX(){
+  if(!ctx){
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    osc=ctx.createOscillator();gain=ctx.createGain();
+    osc.type="square";osc.frequency.value=440;
+    gain.gain.value=0;osc.connect(gain).connect(ctx.destination);osc.start();
+  }
+  gain.gain.setTargetAtTime(.05,ctx.currentTime,.001);
+  gain.gain.setTargetAtTime(0,ctx.currentTime+.03,.005);
+}
+const monitor=document.getElementById("monitor");
+monitor.addEventListener("keydown",e=>{
+  e.preventDefault();
+  const k=e.key;
+  if(k.length===1 && buf.length<PASS.length){
+    buf+=k.toUpperCase();
+    typed.textContent=buf; keyFX();
+  }else if(k==="Backspace" && buf){
+    buf=buf.slice(0,-1); typed.textContent=buf; keyFX();
+  }else if(k==="Enter"){validate();}
+});
+monitor.focus();
+function validate(){
+  if(buf===PASS){
+    msg.style.color="#32ff8a"; msg.textContent="ACCESS GRANTED";
+    typed.classList.remove("blink");
+    setTimeout(()=>location.href="cctv.html",1600);
+  }else{
+    msg.style.color="#ff3242"; msg.textContent="ACCESS DENIED";
+    monitor.style.animation="glitch .3s 3";
+    setTimeout(()=>{monitor.style.animation="none";},900);
+    buf=""; typed.textContent="";
+  }
+}
+</script>
+</body>
+</html>
+EOF
+
+cat > cctv.html << 'EOF'
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>CCTV Dashboard – Placeholder</title>
+<style>
+body{margin:0;display:flex;justify-content:center;align-items:center;
+     height:100vh;background:#000;color:#0f0;font-family:"Courier New",monospace;font-size:28px;}
+</style>
+</head>
+<body>
+CCTV 대시보드(테스트용)<br>로그인 성공 시 이 페이지로 이동합니다.
+</body>
+</html>
+EOF
