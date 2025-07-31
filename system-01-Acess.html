@@ -7,70 +7,102 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 :root{
-  --green:#32ff8a;   /* 네온 글자색  */
-  --bg:#031c11;      /* 중앙 화면 기본색 */
-}
-/* 공통 */
-*{margin:0;padding:0;box-sizing:border-box;
-  font-family:'Press Start 2P',Courier,monospace;
-  user-select:none;-webkit-user-select:none;-ms-user-select:none;}
-body{
-  height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;
-  background:#000;
-  /* CRT 스캔라인 */
-  background-image:repeating-linear-gradient(rgba(0,0,0,.6) 0 4px,rgba(0,0,0,.8) 4px 8px);
+  --green: #32ff8a;   /* 네온 글자색 */
+  --bg: #031c11;      /* 화면 기본색 */
 }
 
-/* ── 화면 (얇은 베젤 + 덜 둥근 모서리 + 내부 그라데이션) ── */
-#monitor{
-  width:90vw;max-width:1000px;height:70vh;max-height:700px;
-  position:relative;
-  border:6px solid #222;            /* 얇은 베젤 */
-  border-radius:30px;               /* 덜 둥근 꼭지점 */
-  /* 중앙은 밝고, 가장자리로 갈수록 어두워지는 그라데이션 */
-  background:radial-gradient(
-    circle at center,
-    #154c30 0%,           /* 중간보다 약간 밝은 색상 */
-    var(--bg) 60%,        /* 기본 화면 색 */
-    #000 100%             /* 바깥쪽은 완전 어둡게 */
-  );
-  overflow:hidden;
+/* 공통 리셋 */
+* {
+  margin: 0; padding: 0; box-sizing: border-box;
+  font-family: 'Press Start 2P', Courier, monospace;
+  user-select: none;
 }
 
-/* ── 텍스트 영역 ── */
-#screen{
-  position:absolute;inset:0;
-  display:flex;flex-direction:column;justify-content:center;align-items:center;
-  color:var(--green);text-shadow:0 0 4px var(--green);
+/* 바디: 스캔라인 + 뒤에서 퍼지는 빛 */
+body {
+  height: 100vh;
+  display: flex; justify-content: center; align-items: center;
+  overflow: hidden;
+  background: 
+    repeating-linear-gradient(rgba(0,0,0,.6) 0 4px, rgba(0,0,0,.8) 4px 8px),
+    radial-gradient(circle at center, rgba(50,255,138,0.2) 0%, transparent 60%),
+    #000;
+  background-blend-mode: normal;
+}
+
+/* 모니터: 베젤 없음, 약간 둥근 모서리, 내부 배경색 */
+#monitor {
+  width: 90vw; max-width: 1000px;
+  height: 70vh; max-height: 700px;
+  position: relative;
+  border: none;                    /* 베젤 제거 */
+  border-radius: 30px;             /* 살짝 둥근 모서리 */
+  background: var(--bg);           /* 화면 기본색으로 채움 */
+  overflow: hidden;
+}
+
+/* 화면 텍스트 영역 */
+#screen {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  color: var(--green);
+  text-shadow: 0 0 4px var(--green);
 }
 
 /* 스캔라인 + 비네팅 */
-#screen::before{
-  content:"";position:absolute;inset:0;
-  background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px);
-  mix-blend-mode:overlay;pointer-events:none;
+#screen::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(transparent 0 2px, rgba(0,0,0,.35) 2px 3px);
+  mix-blend-mode: overlay;
+  pointer-events: none;
 }
-#screen::after{
-  content:"";position:absolute;inset:0;
-  background:radial-gradient(ellipse at center,transparent 0%,transparent 63%,rgba(0,0,0,.48) 100%);
-  pointer-events:none;
+#screen::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center,
+    transparent 0%, transparent 63%, rgba(0,0,0,.48) 100%);
+  pointer-events: none;
 }
 
 /* 랜덤 노이즈 */
-#noise{
-  position:absolute;inset:-35%;
-  background:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCI+PGZpbHRlciBpZD0iej48ZmVGcnVjdGFsTm9pc2UgdHlwZT0idHVyYnVsZW5jZSIgYmFzZUZyZXF1ZW5jeT0iLjkiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsdGVyPSJ1cmwoI3opIiBmaWxsPSIjRkZGIi8+PC9zdmc+");
-  opacity:.05;animation:noise 1s steps(5) infinite;pointer-events:none;
+#noise {
+  position: absolute; inset: -35%;
+  background: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCI+PGZpbHRlciBpZD0iej48ZmVGcnVjdGFsTm9pc2UgdHlwZT0idHVyYnVsZW5jZSIgYmFzZUZyZXF1ZW5jeT0iLjkiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsdGVyPSJ1cmwoI3opIiBmaWxsPSIjRkZGIi8+PC9zdmc+");
+  opacity: .05;
+  animation: noise 1s steps(5) infinite;
+  pointer-events: none;
 }
-@keyframes noise{to{transform:translate(50%,50%);}}
+@keyframes noise {
+  to { transform: translate(50%,50%); }
+}
 
-/* 텍스트 · 입력 · 메시지 */
-h2{font-size:1.9vmin;margin-bottom:3vmin;}
-#typed{width:360px;max-width:60%;padding:6px 0;border-bottom:1px solid var(--green);
-  font-size:2vmin;min-height:38px;text-align:center;letter-spacing:2px;}
-#msg{margin-top:30px;font-size:2vmin;min-height:28px;color:#f44;}
-@keyframes glitch{0%,100%{transform:none;}50%{transform:translate(1px,-1px);}}
-input{caret-color:transparent;}
+/* 텍스트 · 입력 · 메시지 스타일 */
+h2 {
+  font-size: 1.9vmin;
+  margin-bottom: 3vmin;
+}
+#typed {
+  width: 360px; max-width: 60%;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--green);
+  font-size: 2vmin; min-height: 38px;
+  text-align: center; letter-spacing: 2px;
+}
+#msg {
+  margin-top: 30px;
+  font-size: 2vmin;
+  min-height: 28px;
+  color: #f44;
+}
+@keyframes glitch {
+  0%,100% { transform: none; }
+  50%     { transform: translate(1px, -1px); }
+}
+input {
+  caret-color: transparent;
+}
 </style>
 </head>
 <body>
@@ -79,52 +111,94 @@ input{caret-color:transparent;}
   <div id="screen">
     <h2>ENTER THE PASSWORD</h2>
     <div id="typed"></div>
-    <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
+    <input id="hidden" autocomplete="off" style="position:absolute; left:-9999px">
     <div id="msg"></div>
     <div id="noise"></div>
   </div>
 </div>
 
 <script>
-const PASS="LETMEIN";
-let buf="", ambienceStarted=false;
-let ctx;const AC=()=>ctx||(ctx=new(window.AudioContext||window.webkitAudioContext)());
+const PASS = "LETMEIN";
+let buf = "", ambienceStarted = false;
+let ctx;
+const AC = () => ctx || (ctx = new (window.AudioContext || window.webkitAudioContext)());
 
-function tone(f,t){const a=AC(),o=a.createOscillator(),g=a.createGain();
-o.type=t;o.frequency.value=f;g.gain.value=.12;o.connect(g).connect(a.destination);
-o.start();g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+.35);o.stop(a.currentTime+.36);}
+function tone(f, t) {
+  const a = AC(), o = a.createOscillator(), g = a.createGain();
+  o.type = t; o.frequency.value = f; g.gain.value = .12;
+  o.connect(g).connect(a.destination);
+  o.start();
+  g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + .35);
+  o.stop(a.currentTime + .36);
+}
 
-function keyClick(low=false){const a=AC(),o=a.createOscillator(),g=a.createGain();
-o.type="square";o.frequency.value=low?180:820+(Math.random()*60-30);g.gain.value=.08;
-o.connect(g).connect(a.destination);o.start();g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+.04);
-o.stop(a.currentTime+.05);}
+function keyClick(low = false) {
+  const a = AC(), o = a.createOscillator(), g = a.createGain();
+  o.type = "square";
+  o.frequency.value = low ? 180 : 820 + (Math.random() * 60 - 30);
+  g.gain.value = .08;
+  o.connect(g).connect(a.destination);
+  o.start();
+  g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + .04);
+  o.stop(a.currentTime + .05);
+}
 
-function startAmbience(){if(ambienceStarted)return;ambienceStarted=true;const a=AC();
-const h=a.createOscillator(),hg=a.createGain();h.type="sine";h.frequency.value=50;hg.gain.value=.02;
-h.connect(hg).connect(a.destination);h.start();
-const size=a.sampleRate*2,b=a.createBuffer(1,size,a.sampleRate),d=b.getChannelData(0);
-for(let i=0;i<size;i++)d[i]=Math.random()*2-1;
-const n=a.createBufferSource(),ng=a.createGain();n.buffer=b;n.loop=true;ng.gain.value=.015;
-n.connect(ng).connect(a.destination);n.start();}
+function startAmbience() {
+  if (ambienceStarted) return;
+  ambienceStarted = true;
+  const a = AC();
+  const h = a.createOscillator(), hg = a.createGain();
+  h.type = "sine"; h.frequency.value = 50; hg.gain.value = .02;
+  h.connect(hg).connect(a.destination);
+  h.start();
+  const size = a.sampleRate * 2;
+  const b = a.createBuffer(1, size, a.sampleRate);
+  const d = b.getChannelData(0);
+  for (let i = 0; i < size; i++) d[i] = Math.random() * 2 - 1;
+  const n = a.createBufferSource(), ng = a.createGain();
+  n.buffer = b; n.loop = true; ng.gain.value = .015;
+  n.connect(ng).connect(a.destination);
+  n.start();
+}
 
-const typed=document.getElementById("typed"),msg=document.getElementById("msg");
+const typed = document.getElementById("typed"),
+      msg   = document.getElementById("msg");
 
-document.addEventListener("keydown",e=>{
-  startAmbience();const k=e.key;
-  if(k==="Backspace"){e.preventDefault();buf=buf.slice(0,-1);typed.textContent=buf;keyClick(true);return;}
-  if(k==="Enter"){e.preventDefault();check();return;}
-  if(k.length===1&&buf.length<PASS.length){buf+=k.toUpperCase();typed.textContent=buf;keyClick();}
+document.addEventListener("keydown", e => {
+  startAmbience();
+  const k = e.key;
+  if (k === "Backspace") {
+    e.preventDefault();
+    buf = buf.slice(0, -1);
+    typed.textContent = buf;
+    keyClick(true);
+    return;
+  }
+  if (k === "Enter") {
+    e.preventDefault();
+    return check();
+  }
+  if (k.length === 1 && buf.length < PASS.length) {
+    buf += k.toUpperCase();
+    typed.textContent = buf;
+    keyClick();
+  }
 });
 
-function check(){
-  if(buf===PASS){
-    msg.style.color="var(--green)";msg.textContent="ACCESS GRANTED";tone(440,"triangle");
-    setTimeout(()=>location.href="system-01-Acess.html",1400);
-  }else{
-    msg.style.color="#f44";msg.textContent="ACCESS DENIED";tone(120,"sawtooth");
-    document.getElementById("screen").style.animation="glitch .35s 2";
-    setTimeout(()=>document.getElementById("screen").style.animation="none",700);
-    buf="";typed.textContent="";
+function check() {
+  if (buf === PASS) {
+    msg.style.color = "var(--green)";
+    msg.textContent = "ACCESS GRANTED";
+    tone(440, "triangle");
+    setTimeout(() => location.href = "system-01-Acess.html", 1400);
+  } else {
+    msg.style.color = "#f44";
+    msg.textContent = "ACCESS DENIED";
+    tone(120, "sawtooth");
+    document.getElementById("screen").style.animation = "glitch .35s 2";
+    setTimeout(() => document.getElementById("screen").style.animation = "none", 700);
+    buf = "";
+    typed.textContent = "";
   }
 }
 </script>
