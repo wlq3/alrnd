@@ -21,15 +21,19 @@ body{
       rgba(0,0,0,.8) 4px 8px);
 }
 
+
 /* ── 둥근 베젤 ── */
 #cabinet{
   width:90vw;max-width:1000px;height:70vh;max-height:700px;
+
+  /* 밖 → 안으로 차례대로 밝아짐 */
   background:radial-gradient(circle at center,
-              #000 0%,      /* 가장자리 완전 검정 */
-              #111 35%,
-              #1b1b1b 65%,
-              #2d2d2d 85%,  /* 안쪽이 가장 밝음 */
-              #333 100%);
+              #000000 0%,    /* 가장 바깥, 완전 검정 */
+              #0a0a0a 25%,
+              #141414 50%,
+              #222222 75%,
+              #303030 100%); /* 화면 유리 직전이 가장 밝음 */
+
   border-radius:80px;
   box-shadow:0 0 40px #000 inset,0 0 60px #000;
   display:flex;justify-content:center;align-items:center;
