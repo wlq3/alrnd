@@ -6,176 +6,142 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-:root{--green:#32ff8a;--bg:#031c11;}
+:root{--green:#35ff8a;--bg:#031c11;}
 *{margin:0;padding:0;box-sizing:border-box;
-  font-family:'Press Start 2P',Courier,monospace;
-/* 드래그 차단 */
-  user-select:none;-webkit-user-select:none;-ms-user-select:none;}
-body{
-  height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;
-  background:#000;
-/* 고정 CRT 무늬(배경 전체) */
+   font-family:'Press Start 2P',monospace;
+   user-select:none;-webkit-user-select:none;-ms-user-select:none;}
+html,body{height:100%;background:#000;
+  background-image:radial-gradient(circle at center,#001a0e 0%,#000 80%);display:flex;justify-content:center;align-items:center;}
+
+/* ── 외부 쉘(모니터 하우징) ───────────────────────────── */
+.shell{
+  position:relative;
+  width:900px;height:560px;
+  border-radius:32px;
+  padding:34px 36px 120px;           /* 좌우/상단 베젤, 하단 하우징 여백 */
+  background:#01180d;                /* 기본 어두운 올리브 */
   background-image:
-    repeating-linear-gradient(
-      rgba(0,0,0,.6) 0 4px,
-      rgba(0,0,0,.8) 4px 8px);
-}
-
-
-/* ── 둥근 베젤 구분 강조 ── */
-#cabinet{
-  width:90vw;max-width:1000px;height:70vh;max-height:700px;
-
-  /* 바깥쪽 완전 검정 → 안쪽 밝은 회색으로 훨씬 더 대비 */
-  background:radial-gradient(circle at center,
-              #000 0%,          /* 외곽선 : 완전 검정 */
-              #0b0b0b 20%,      /* 살짝 밝음 */
-              #1a1a1a 45%,      /* 중간 영역 */
-              #2f2f2f 70%,      /* 내부에 가까워지며 더 밝아짐 */
-              #484848 100%);    /* 베젤 가장 안쪽 : 분명하게 회색 */
-
-  border-radius:80px;
-
-  /* ✱ 보더에 '빛 반사선 + 짙은 외곽선' 추가 */
+     radial-gradient(circle at 25% 15%,rgba(70,120,80,.12) 0%,transparent 60%),
+     radial-gradient(circle at 75% 85%,rgba(0,50,30,.25) 0%,transparent 70%),
+     linear-gradient(180deg,rgba(255,255,255,.05) 0%,rgba(0,0,0,.4) 90%);
   box-shadow:
-      0 0 60px #000 inset,          /* 기존 내부 깊이감 */
-      0 0 12px #000,                /* 외곽 어둡게 (림) */
-      0 0 2px 2px rgba(255,255,255,.08) inset; /* 얇은 밝은 하이라이트 */
-
-  display:flex;justify-content:center;align-items:center;
+     0 0 40px #000 inset,           /* 안쪽 깊이 */
+     0 12px 35px rgba(0,0,0,.9);    /* 주변 그림자 */
 }
 
-
-/* ── 유리판 ── */
-#monitor{
-  position:relative;width:97%;height:92%;background:var(--bg);
-  border-radius:50px;box-shadow:inset 0 0 140px #010;overflow:hidden;
+/* ── 베젤(유리 바로 앞 프레임) ────────────────────────── */
+.bezel{
+  position:relative;width:100%;height:100%;
+  background:#111;border-radius:18px;
+  box-shadow:inset 0 0 60px #000;
+  overflow:hidden;
 }
 
-/* ── 화면 ── */
+/* ── 실제 화면 ───────────────────────────────────────── */
 #screen{
-  position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
-  color:var(--green);text-shadow:0 0 4px var(--green);
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;color:var(--green);
+  text-shadow:0 0 4px var(--green);background:var(--bg);
 }
 
 /* 스캔라인 + 비네팅 */
 #screen::before{content:"";position:absolute;inset:0;
   background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px);
-  mix-blend-mode:overlay;pointer-events:none;}
+  mix-blend-mode:overlay;}
 #screen::after{content:"";position:absolute;inset:0;
-  background:radial-gradient(ellipse at center,transparent 0%,transparent 63%,rgba(0,0,0,.48) 100%);
-  pointer-events:none;}
+  background:radial-gradient(ellipse at center,transparent 0,transparent 65%,rgba(0,0,0,.55) 100%);}
 
 /* 노이즈 */
-#noise{
-  position:absolute;inset:-35%;
-  background:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCI+PGZpbHRlciBpZD0iej48ZmVGcnVjdGFsTm9pc2UgdHlwZT0idHVyYnVsZW5jZSIgYmFzZUZyZXF1ZW5jeT0iLjkiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsdGVyPSJ1cmwoI3opIiBmaWxsPSIjRkZGIi8+PC9zdmc+");
+#noise{position:absolute;inset:-50%;
+  background:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCI+PGZpbHRlciBpZD0ibm9pc2UiPjxmZUZydWN0YWxOb2lzZSB0eXBlPSJ0dXJidWxlbmNlIiBiYXNlRnJlcXVlbmN5PSIuOSIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsdGVyPSJ1cmwoI25vaXNlKSIgZmlsbD0iI0ZGRiIvPjwvc3ZnPg==");
   opacity:.05;animation:noise 1s steps(5) infinite;pointer-events:none;}
-@keyframes noise{to{transform:translate(50%,50%);}}
+@keyframes noise{to{transform:translate(25%,25%);}}
 
-/* 입력/메시지 */
-h2{font-size:1.9vmin;margin-bottom:3vmin;}
-#typed{width:360px;max-width:60%;padding:6px 0;border-bottom:1px solid var(--green);
-  font-size:2vmin;min-height:38px;text-align:center;letter-spacing:2px;}
-#msg{margin-top:30px;font-size:2vmin;min-height:28px;color:#f44;}
+/* ── 입력 영역 ── */
+h2{font-size:1.6vmin;margin-bottom:3vmin;letter-spacing:2px;}
+#typed{width:330px;padding:4px 0;border-bottom:1px solid var(--green);
+  font-size:1.9vmin;min-height:36px;text-align:center;letter-spacing:2px;}
+#msg{margin-top:28px;font-size:1.8vmin;min-height:26px;color:#f44;}
 @keyframes glitch{0%,100%{transform:none;}50%{transform:translate(1px,-1px);}}
 
-/* 노커서 깜빡임 제거 – caret 숨김 */
+/* ── 하단 통풍구 & 전원 버튼 ─────────────────────────── */
+.vent{
+  position:absolute;bottom:46px;left:50%;transform:translateX(-50%);
+  width:320px;height:32px;
+  background:repeating-linear-gradient(
+     to right,transparent 0 12px,#000 12px 20px);
+  opacity:.35;border-radius:3px;
+}
+.power-btn{
+  position:absolute;right:48px;bottom:40px;width:46px;height:46px;
+  background:#ff8840;border-radius:6px;
+  box-shadow:
+     inset 0 0 6px rgba(255,255,255,.3),
+     0 0 12px rgba(255,120,30,.6);
+}
+
+/* 커서 숨김 */
 input{caret-color:transparent;}
 </style>
 </head>
 <body>
 
-<div id="cabinet">
-  <div id="monitor">
-    <div id="screen">
-      <h2>ENTER THE PASSWORD</h2>
-      <div id="typed"></div>
-      <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
-      <div id="msg"></div>
-      <div id="noise"></div>
+<div class="shell">
+  <div id="cabinet" class="shell">    <!-- 필요 없는 중복 class 방지 위해 shell 대신 bezel 변환 -->
+    <div class="bezel">
+      <div id="screen" tabindex="0">
+        <h2>ENTER THE PASSWORD</h2>
+        <div id="typed"></div>
+        <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
+        <div id="msg"></div>
+        <div id="noise"></div>
+      </div>
     </div>
+    <!-- 하우징 장식 -->
+    <div class="vent"></div>
+    <div class="power-btn"></div>
   </div>
 </div>
 
 <script>
-const PASS = "LETMEIN";
-let buf = "", ambienceStarted = false;   /* 불린 변수 이름 변경 */
+/* ========== 설정 ========== */
+const PASS="LETMEIN";
+let buffer="",ambience=false;
+let ctx;const AC=()=>ctx||(ctx=new(window.AudioContext||window.webkitAudioContext));
 
-let ctx;
-const AC = () => ctx || (ctx = new (window.AudioContext || window.webkitAudioContext));
-
-function tone(freq, type){
-  const ac = AC(), osc = ac.createOscillator(), g = ac.createGain();
-  osc.type = type; osc.frequency.value = freq; g.gain.value = .12;
-  osc.connect(g).connect(ac.destination);
-  osc.start();
-  g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + .35);
-  osc.stop(ac.currentTime + .36);
+function tone(f,type){
+  const ac=AC(),o=ac.createOscillator(),g=ac.createGain();
+  o.type=type;o.frequency.value=f;g.gain.value=.12;
+  o.connect(g).connect(ac.destination);o.start();
+  g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.35);
+  o.stop(ac.currentTime+.36);
+}
+function startAmb(){
+  if(ambience)return; ambience=true;
+  const ac=AC(),hum=ac.createOscillator(),hg=ac.createGain();
+  hum.type="sine";hum.frequency.value=50;hg.gain.value=.025;
+  hum.connect(hg).connect(ac.destination);hum.start();
 }
 
-/* 배경 Hum + 화이트노이즈 */
-function startAmbience(){
-  if (ambienceStarted) return;
-  ambienceStarted = true;
-  const ac = AC();
-
-  // Hum
-  const hum = ac.createOscillator(), hg = ac.createGain();
-  hum.type = "sine"; hum.frequency.value = 50; hg.gain.value = .02;
-  hum.connect(hg).connect(ac.destination); hum.start();
-
-  // White noise
-  const size = ac.sampleRate * 2,
-        bufN = ac.createBuffer(1, size, ac.sampleRate),
-        data = bufN.getChannelData(0);
-  for (let i = 0; i < size; i++) data[i] = Math.random() * 2 - 1;
-  const noise = ac.createBufferSource(), ng = ac.createGain();
-  noise.buffer = bufN; noise.loop = true; ng.gain.value = .015;
-  noise.connect(ng).connect(ac.destination); noise.start();
-}
-
-const typed = document.getElementById("typed"),
-      msg   = document.getElementById("msg");
-
-document.addEventListener("keydown", (e) => {
-  startAmbience();
-  const k = e.key;
-
-  if (k === "Backspace") {
-    e.preventDefault();
-    buf = buf.slice(0, -1); typed.textContent = buf;
-    return;
-  }
-
-  if (k === "Enter") {
-    e.preventDefault();
-    check();
-    return;
-  }
-
-  if (k.length === 1 && buf.length < PASS.length) {
-    buf += k.toUpperCase();
-    typed.textContent = buf;
-  }
+const typed=document.getElementById("typed"),msg=document.getElementById("msg");
+window.addEventListener("keydown",e=>{
+  startAmb(); const k=e.key;
+  if(k==="Backspace"){e.preventDefault();buffer=buffer.slice(0,-1);typed.textContent=buffer;return;}
+  if(k==="Enter"){e.preventDefault();check();return;}
+  if(k.length===1 && buffer.length<PASS.length){buffer+=k.toUpperCase();typed.textContent=buffer;}
 });
 
 function check(){
-  if (buf === PASS){
-    msg.style.color = "var(--green)";
-    msg.textContent = "ACCESS GRANTED";
-    tone(440, "triangle");
-    setTimeout(()=>location.href="system-01-Acess.html", 1400);
-  } else {
-    msg.style.color = "#f44";
-    msg.textContent = "ACCESS DENIED";
-    tone(120, "sawtooth");
-    document.getElementById("screen").style.animation = "glitch .35s 2";
-    setTimeout(()=>document.getElementById("screen").style.animation = "none", 700);
-    buf = ""; typed.textContent = "";
+  if(buffer===PASS){
+    msg.style.color="var(--green)";msg.textContent="ACCESS GRANTED";tone(440,"triangle");
+    setTimeout(()=>location.href="system-01-Acess.html",1400);
+  }else{
+    msg.style.color="#f44";msg.textContent="ACCESS DENIED";tone(120,"sawtooth");
+    const s=document.getElementById("screen");s.style.animation="glitch .35s 2";
+    setTimeout(()=>s.style.animation="none",700);
+    buffer="";typed.textContent="";
   }
 }
 </script>
-
 </body>
 </html>
