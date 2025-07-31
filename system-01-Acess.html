@@ -7,14 +7,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 :root{
-  --green:#32ff8a;       /* 네온 텍스트 */
-  --bg-top:#06412d;      /* 화면 위쪽 */
-  --bg-bot:#02170f;      /* 화면 아래쪽 */
+  --green:#32ff8a;   /* 네온 텍스트 */
 }
-/* 기본 세팅 */
+/* 공통 */
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Press Start 2P',Courier,monospace;
   user-select:none;-webkit-user-select:none;-ms-user-select:none;}
-/* 바깥 배경 : 중앙은 살짝 밝고, 외곽은 암전 */
+
+/* ── 바깥 배경 : 중앙 밝음 → 외곽 암전 + CRT 스캔라인 ── */
 body{
   height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;
   background:#000;
@@ -26,26 +25,24 @@ body{
 
 /* ── 얇은 베젤 ── */
 #bezel{
-  padding:1.2vmin;                     /* 베젤 두께 */
+  padding:1.2vmin;                      /* 베젤 두께 */
   width:90vw;max-width:1000px;
   height:70vh;max-height:700px;
   background:#101010;
-  border-radius:36px;                  /* 베젤 둥글기 */
+  border-radius:36px;
   box-shadow:0 0 50px rgba(0,0,0,.8) inset,0 0 40px rgba(0,0,0,.7);
   display:flex;justify-content:center;align-items:center;
 }
 
 /* ── 실제 화면 ── */
 #monitor{
-  flex:1;                              /* 베젤 안쪽 전부 채움 */
+  flex:1;
   position:relative;
-  /* 위쪽은 조금 밝고 아래쪽은 깊이감 있는 짙은색 */
-  background:linear-gradient(#06412d 0%,#02170f 100%);
-  border:2px solid #0a3b29;            /* 얇은 라인으로 경계 표시 */
-  border-radius:22px;                  /* 화면 꼭지점 – 베젤보다 덜 둥글게 */
-  box-shadow:
-    0 0 40px rgba(50,255,138,.15),     /* 초록빛 흐림 */
-    inset 0 0 100px #010;              /* 내부 암부 */
+  /* 위쪽 밝게, 아래쪽 짙게 → 글자 가독성 개선 */
+  background:linear-gradient(#0e3c29 0%, #06281a 100%);
+  border:2px solid #0a3b29;
+  border-radius:22px;                   /* 덜 둥근 꼭지점 */
+  box-shadow:0 0 40px rgba(50,255,138,.15), inset 0 0 100px #010;
   overflow:hidden;
 }
 
@@ -56,14 +53,14 @@ body{
   color:var(--green);text-shadow:0 0 4px var(--green);
 }
 
-/* 스캔라인 + 비네팅 */
+/* 스캔라인 + 비네트 (텍스트 위로 안 덮이도록 z-index -1) */
 #screen::before{
-  content:"";position:absolute;inset:0;
+  content:"";position:absolute;inset:0;z-index:-1;
   background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px);
   mix-blend-mode:overlay;pointer-events:none;
 }
 #screen::after{
-  content:"";position:absolute;inset:0;
+  content:"";position:absolute;inset:0;z-index:-1;
   background:radial-gradient(ellipse at center,transparent 0%,transparent 63%,rgba(0,0,0,.48) 100%);
   pointer-events:none;
 }
@@ -72,7 +69,7 @@ body{
 #noise{
   position:absolute;inset:-35%;
   background:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCI+PGZpbHRlciBpZD0iej48ZmVGcnVjdGFsTm9pc2UgdHlwZT0idHVyYnVsZW5jZSIgYmFzZUZyZXF1ZW5jeT0iLjkiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsdGVyPSJ1cmwoI3opIiBmaWxsPSIjRkZGIi8+PC9zdmc+");
-  opacity:.05;animation:noise 1s steps(5) infinite;pointer-events:none;
+  opacity:.05;animation:noise 1s steps(5) infinite;pointer-events:none;z-index:-1;
 }
 @keyframes noise{to{transform:translate(50%,50%);}}
 
@@ -104,7 +101,7 @@ const PASS="LETMEIN";
 let buf="", ambienceStarted=false;
 let ctx;const AC=()=>ctx||(ctx=new(window.AudioContext||window.webkitAudioContext)());
 
-/* 엔터·오류 효과음 */
+/* 확인·실패 효과음 */
 function tone(f,t){const a=AC(),o=a.createOscillator(),g=a.createGain();
 o.type=t;o.frequency.value=f;g.gain.value=.12;o.connect(g).connect(a.destination);
 o.start();g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+.35);o.stop(a.currentTime+.36);}
