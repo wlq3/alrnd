@@ -2,67 +2,74 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>Acess</title>
+<title>Access</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-:root{--green:#32ff8a;--bg:#031c11;}
-*{margin:0;padding:0;box-sizing:border-box;
+:root{
+  --green:#32ff8a;
+  --bg:#031c11;
+}
+*{
+  margin:0;padding:0;box-sizing:border-box;
   font-family:'Press Start 2P',Courier,monospace;
-/* 드래그 차단 */
-  user-select:none;-webkit-user-select:none;-ms-user-select:none;}
+  user-select:none;-webkit-user-select:none;-ms-user-select:none;
+}
 body{
   height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;
   background:#000;
-/* 고정 CRT 무늬(배경 전체) */
   background-image:
-    repeating-linear-gradient(
-      rgba(0,0,0,.6) 0 4px,
-      rgba(0,0,0,.8) 4px 8px);
+    repeating-linear-gradient(rgba(0,0,0,.6) 0 4px,rgba(0,0,0,.8) 4px 8px);
 }
-
-/* ── 둥근 베젤 ── */
 #cabinet{
-  width:90vw;max-width:1000px;height:70vh;max-height:700px;background:#111;
-  border-radius:80px;box-shadow:0 0 40px #000 inset,0 0 60px #000;
+  width:90vw;max-width:1000px;height:70vh;max-height:700px;
+  border-radius:80px;
+  background:radial-gradient(circle at center,
+              #181818 0%,
+              #111 60%,
+              #050505 85%,
+              #000 100%);
+  box-shadow:
+    0 0 80px rgba(0,0,0,.9) inset,
+    0 0 40px rgba(0,0,0,.8),
+    0 0 120px rgba(50,255,138,.18);
   display:flex;justify-content:center;align-items:center;
 }
-
-/* ── 유리판 ── */
 #monitor{
   position:relative;width:97%;height:92%;background:var(--bg);
-  border-radius:50px;box-shadow:inset 0 0 140px #010;overflow:hidden;
+  border-radius:50px;
+  box-shadow:inset 0 0 140px #010;
+  overflow:hidden;
 }
-
-/* ── 화면 ── */
 #screen{
-  position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
   color:var(--green);text-shadow:0 0 4px var(--green);
 }
-
-/* 스캔라인 + 비네팅 */
-#screen::before{content:"";position:absolute;inset:0;
+#screen::before{
+  content:"";position:absolute;inset:0;
   background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px);
-  mix-blend-mode:overlay;pointer-events:none;}
-#screen::after{content:"";position:absolute;inset:0;
+  mix-blend-mode:overlay;pointer-events:none;
+}
+#screen::after{
+  content:"";position:absolute;inset:0;
   background:radial-gradient(ellipse at center,transparent 0%,transparent 63%,rgba(0,0,0,.48) 100%);
-  pointer-events:none;}
-
-/* 노이즈 */
+  pointer-events:none;
+}
 #noise{
   position:absolute;inset:-35%;
   background:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCI+PGZpbHRlciBpZD0iej48ZmVGcnVjdGFsTm9pc2UgdHlwZT0idHVyYnVsZW5jZSIgYmFzZUZyZXF1ZW5jeT0iLjkiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsdGVyPSJ1cmwoI3opIiBmaWxsPSIjRkZGIi8+PC9zdmc+");
-  opacity:.05;animation:noise 1s steps(5) infinite;pointer-events:none;}
+  opacity:.05;animation:noise 1s steps(5) infinite;pointer-events:none;
+}
 @keyframes noise{to{transform:translate(50%,50%);}}
-
-/* 입력/메시지 */
 h2{font-size:1.9vmin;margin-bottom:3vmin;}
-#typed{width:360px;max-width:60%;padding:6px 0;border-bottom:1px solid var(--green);
-  font-size:2vmin;min-height:38px;text-align:center;letter-spacing:2px;}
+#typed{
+  width:360px;max-width:60%;
+  padding:6px 0;border-bottom:1px solid var(--green);
+  font-size:2vmin;min-height:38px;text-align:center;letter-spacing:2px;
+}
 #msg{margin-top:30px;font-size:2vmin;min-height:28px;color:#f44;}
 @keyframes glitch{0%,100%{transform:none;}50%{transform:translate(1px,-1px);}}
-
-/* 노커서 깜빡임 제거 – caret 숨김 */
 input{caret-color:transparent;}
 </style>
 </head>
@@ -71,7 +78,7 @@ input{caret-color:transparent;}
 <div id="cabinet">
   <div id="monitor">
     <div id="screen">
-      <h2>ENTER THE PASSWORD</h2>
+      <h2>ENTER THE PASSWORD</h2>
       <div id="typed"></div>
       <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
       <div id="msg"></div>
@@ -82,10 +89,10 @@ input{caret-color:transparent;}
 
 <script>
 const PASS = "LETMEIN";
-let buf = "", ambienceStarted = false;   /* 불린 변수 이름 변경 */
+let buf = "", ambienceStarted = false;
 
 let ctx;
-const AC = () => ctx || (ctx = new (window.AudioContext || window.webkitAudioContext));
+const AC = () => ctx || (ctx = new (window.AudioContext || window.webkitAudioContext)());
 
 function tone(freq, type){
   const ac = AC(), osc = ac.createOscillator(), g = ac.createGain();
@@ -95,19 +102,23 @@ function tone(freq, type){
   g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + .35);
   osc.stop(ac.currentTime + .36);
 }
-
-/* 배경 Hum + 화이트노이즈 */
+function keyClick(low = false){
+  const ac = AC(), osc = ac.createOscillator(), g = ac.createGain();
+  osc.type = "square";
+  osc.frequency.value = low ? 180 : 820 + (Math.random()*60 - 30);
+  g.gain.value = .08;
+  osc.connect(g).connect(ac.destination);
+  osc.start();
+  g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + .04);
+  osc.stop(ac.currentTime + .05);
+}
 function startAmbience(){
   if (ambienceStarted) return;
   ambienceStarted = true;
   const ac = AC();
-
-  // Hum
   const hum = ac.createOscillator(), hg = ac.createGain();
   hum.type = "sine"; hum.frequency.value = 50; hg.gain.value = .02;
   hum.connect(hg).connect(ac.destination); hum.start();
-
-  // White noise
   const size = ac.sampleRate * 2,
         bufN = ac.createBuffer(1, size, ac.sampleRate),
         data = bufN.getChannelData(0);
@@ -116,41 +127,39 @@ function startAmbience(){
   noise.buffer = bufN; noise.loop = true; ng.gain.value = .015;
   noise.connect(ng).connect(ac.destination); noise.start();
 }
-
 const typed = document.getElementById("typed"),
       msg   = document.getElementById("msg");
 
 document.addEventListener("keydown", (e) => {
   startAmbience();
   const k = e.key;
-
-  if (k === "Backspace") {
+  if (k === "Backspace"){
     e.preventDefault();
-    buf = buf.slice(0, -1); typed.textContent = buf;
+    buf = buf.slice(0, -1);
+    typed.textContent = buf;
+    keyClick(true);
     return;
   }
-
-  if (k === "Enter") {
+  if (k === "Enter"){
     e.preventDefault();
     check();
     return;
   }
-
-  if (k.length === 1 && buf.length < PASS.length) {
+  if (k.length === 1 && buf.length < PASS.length){
     buf += k.toUpperCase();
     typed.textContent = buf;
+    keyClick();
   }
 });
-
 function check(){
   if (buf === PASS){
     msg.style.color = "var(--green)";
-    msg.textContent = "ACCESS GRANTED";
+    msg.textContent = "ACCESS GRANTED";
     tone(440, "triangle");
     setTimeout(()=>location.href="system-01-Acess.html", 1400);
   } else {
     msg.style.color = "#f44";
-    msg.textContent = "ACCESS DENIED";
+    msg.textContent = "ACCESS DENIED";
     tone(120, "sawtooth");
     document.getElementById("screen").style.animation = "glitch .35s 2";
     setTimeout(()=>document.getElementById("screen").style.animation = "none", 700);
