@@ -22,20 +22,26 @@ body{
 }
 
 
-/* ── 둥근 베젤 ── */
+/* ── 둥근 베젤 구분 강조 ── */
 #cabinet{
   width:90vw;max-width:1000px;height:70vh;max-height:700px;
 
-  /* 밖 → 안으로 차례대로 밝아짐 */
+  /* 바깥쪽 완전 검정 → 안쪽 밝은 회색으로 훨씬 더 대비 */
   background:radial-gradient(circle at center,
-              #000000 0%,    /* 가장 바깥, 완전 검정 */
-              #0a0a0a 25%,
-              #141414 50%,
-              #222222 75%,
-              #303030 100%); /* 화면 유리 직전이 가장 밝음 */
+              #000 0%,          /* 외곽선 : 완전 검정 */
+              #0b0b0b 20%,      /* 살짝 밝음 */
+              #1a1a1a 45%,      /* 중간 영역 */
+              #2f2f2f 70%,      /* 내부에 가까워지며 더 밝아짐 */
+              #484848 100%);    /* 베젤 가장 안쪽 : 분명하게 회색 */
 
   border-radius:80px;
-  box-shadow:0 0 40px #000 inset,0 0 60px #000;
+
+  /* ✱ 보더에 '빛 반사선 + 짙은 외곽선' 추가 */
+  box-shadow:
+      0 0 60px #000 inset,          /* 기존 내부 깊이감 */
+      0 0 12px #000,                /* 외곽 어둡게 (림) */
+      0 0 2px 2px rgba(255,255,255,.08) inset; /* 얇은 밝은 하이라이트 */
+
   display:flex;justify-content:center;align-items:center;
 }
 
