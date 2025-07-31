@@ -2,88 +2,67 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>Acess</title>
+<title>RobCo Terminal</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-/* ── 공통 ──────────────────────────────────────────── */
 :root{
-  --green:#2cf891;          /* 글씨 형광 그린 */
-  --shell:#0a1b12;          /* 하우징 기본색 */
-  --shell-hi:#1d3827;       /* 하우징 빛 받는 면 */
-  --shell-lo:#030906;       /* 하우징 그림자 */
-  --bezel:#06110b;          /* 안쪽 베젤 */
-  --glow:#002a14;           /* 화면 녹색 글로우 */
+  --green:#2cf891; --shell:#0a1b12; --shell-hi:#1d3827;
+  --shell-lo:#030906; --bezel:#06110b;
 }
-*{margin:0;padding:0;box-sizing:border-box;
-  font-family:'Press Start 2P',monospace;
-  user-select:none;-webkit-user-select:none;-ms-user-select:none}
-html,body{height:100%;background:#000;display:flex;justify-content:center;align-items:center;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Press Start 2P',monospace;
+  user-select:none;-webkit-user-select:none;-ms-user-select:none;}
+html,body{height:100%;background:#000;
+  display:flex;justify-content:center;align-items:center;}
 
-/* ── 1. 외곽 하우징(shell) ─────────────────────────── */
+/* ── 1. 외곽 하우징 ── */
 .shell{
-  position:relative;
-  width:920px;height:620px;          /* 실제 비율에 맞춤 */
-  border-radius:38px;
-  padding:34px 36px 130px;           /* 상·좌우·하 베젤 두께 */
+  position:relative;width:920px;height:620px;border-radius:38px;
+  padding:34px 36px 130px;
   background:linear-gradient(180deg,var(--shell-hi) 0%,var(--shell) 50%,var(--shell-lo) 100%);
-  box-shadow:
-    inset 0 0 60px #000,             /* 깊은 내부 음영 */
-    0 18px 45px rgba(0,0,0,.9);      /* 환경 드롭 섀도 */
+  box-shadow:0 18px 45px rgba(0,0,0,.9);
   filter:saturate(115%);
 }
+/* ▶ 모서리 흐림용 오버레이 */
+.shell::after{
+  content:"";position:absolute;inset:-1px;border-radius:inherit;
+  box-shadow:0 0 55px 20px #000 inset; /* 두툼한 안쪽 그림자 */
+  filter:blur(3px);                    /* 소프트-엣지 효과 */
+  pointer-events:none;
+}
 
-/* ── 2. 통풍구  & POWER 버튼 ‐ 장식 ───────────────── */
-.vent{
-  position:absolute;bottom:62px;left:50%;transform:translateX(-50%);
+/* ── 하부 장식 ── */
+.vent{position:absolute;bottom:62px;left:50%;transform:translateX(-50%);
   width:360px;height:34px;border-radius:4px;
-  background:repeating-linear-gradient(
-     to right,transparent 0 11px,#000 11px 21px);
-  opacity:.35;
-}
-.power{
-  position:absolute;right:60px;bottom:54px;width:60px;height:60px;
+  background:repeating-linear-gradient(to right,transparent 0 11px,#000 11px 21px);
+  opacity:.35;}
+.power{position:absolute;right:60px;bottom:54px;width:60px;height:60px;
   background:#ff8a3a;border-radius:8px;
-  box-shadow:
-    inset 0 0 8px rgba(255,255,255,.2),
-    0 0 18px rgba(255,120,40,.55);
-}
+  box-shadow:inset 0 0 8px rgba(255,255,255,.2),0 0 18px rgba(255,120,40,.55);}
 
-/* ── 3. 베젤(bezel) ───────────────────────────────── */
-.bezel{
-  width:100%;height:100%;
+/* ── 베젤 ── */
+.bezel{width:100%;height:100%;border-radius:22px;overflow:hidden;
   background:radial-gradient(circle at 30% 10%,#122619 0%,#0b1a11 60%,#010602 100%);
-  border-radius:22px;
-  box-shadow:inset 0 0 90px #000;
-  overflow:hidden;
-}
+  box-shadow:inset 0 0 90px #000;}
 
-/* ── 4. CRT 유리(screen) ─────────────────────────── */
-#screen{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  justify-content:center;align-items:center;
-  color:var(--green);text-shadow:0 0 6px var(--green);
-  background:#021208;
-}
-/* 스캔라인+비네팅+Glow */
+/* ── CRT 화면 ── */
+#screen{position:absolute;inset:0;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;color:var(--green);
+  text-shadow:0 0 6px var(--green);background:#021208;}
 #screen::before{content:"";position:absolute;inset:0;
   background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px),
-             radial-gradient(circle at center,#083c26 0%,transparent 60%);
-  mix-blend-mode:overlay;}
+             radial-gradient(circle at center,#083c26 0%,transparent 60%);}
 #screen::after{content:"";position:absolute;inset:0;
   background:radial-gradient(ellipse at center,transparent 0,transparent 68%,rgba(0,0,0,.55) 100%);}
 
-/* ── 5. 인터랙션 영역 ────────────────────────────── */
+/* ── UI 텍스트 ── */
 h2{font-size:1.6vmin;margin-bottom:40px;letter-spacing:2px;}
-#typed{
-  width:380px;max-width:70%;padding:5px 0;
-  border-bottom:1.2px solid var(--green);
-  font-size:1.9vmin;min-height:36px;text-align:center;letter-spacing:2px;
-}
+#typed{width:380px;max-width:70%;padding:5px 0;border-bottom:1px solid var(--green);
+  font-size:1.9vmin;min-height:36px;text-align:center;letter-spacing:2px;}
 #msg{margin-top:38px;font-size:1.8vmin;min-height:28px;color:#f44;}
 @keyframes glitch{0%,100%{transform:none;}50%{transform:translate(1px,-1px);}}
 
-/* cursor 숨김 */
+/* 커서 숨김 */
 input{caret-color:transparent;}
 </style>
 </head>
@@ -104,21 +83,15 @@ input{caret-color:transparent;}
 </div>
 
 <script>
-/* 기본 값 */
 const PASS="LETMEIN";
 let buf="",amb=false;
 let ctx;const AC=()=>ctx||(ctx=new(window.AudioContext||window.webkitAudioContext));
-
-function tone(f,type){
-  const ac=AC(),o=ac.createOscillator(),g=ac.createGain();
-  o.type=type;o.frequency.value=f;g.gain.value=.12;o.connect(g).connect(ac.destination);
-  o.start();g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.35);o.stop(ac.currentTime+.36);
-}
-function ambience(){
-  if(amb)return;amb=true;
+function tone(f,t){const ac=AC(),o=ac.createOscillator(),g=ac.createGain();
+  o.type=t;o.frequency.value=f;g.gain.value=.12;o.connect(g).connect(ac.destination);
+  o.start();g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.35);o.stop(ac.currentTime+.36);}
+function ambience(){if(amb)return;amb=true;
   const ac=AC(),hum=ac.createOscillator(),g=ac.createGain();
-  hum.type="sine";hum.frequency.value=50;g.gain.value=.025;hum.connect(g).connect(ac.destination);hum.start();
-}
+  hum.type="sine";hum.frequency.value=50;g.gain.value=.025;hum.connect(g).connect(ac.destination);hum.start();}
 const typed=document.getElementById("typed"),msg=document.getElementById("msg");
 window.addEventListener("keydown",e=>{
   ambience();
@@ -133,7 +106,8 @@ function check(){
   }else{
     msg.style.color="#f44";msg.textContent="ACCESS DENIED";tone(120,"sawtooth");
     const sc=document.getElementById("screen");sc.style.animation="glitch .35s 2";
-    setTimeout(()=>sc.style.animation="none",700);buf="";typed.textContent="";
+    setTimeout(()=>sc.style.animation="none",700);
+    buf="";typed.textContent="";
   }
 }
 </script>
