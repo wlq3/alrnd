@@ -7,48 +7,45 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 :root{
-  --green:#32ff8a;    /* 네온 글자색   */
-  --bg:#031c11;       /* 실제 화면색   */
+  --green:#32ff8a;       /* 네온 텍스트 */
+  --bg-top:#06412d;      /* 화면 위쪽 */
+  --bg-bot:#02170f;      /* 화면 아래쪽 */
 }
-/* 공통 */
-*{margin:0;padding:0;box-sizing:border-box;
-  font-family:'Press Start 2P',Courier,monospace;
+/* 기본 세팅 */
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Press Start 2P',Courier,monospace;
   user-select:none;-webkit-user-select:none;-ms-user-select:none;}
-/* 몸통 : 중앙 근처는 살짝 밝고, 가장자리는 암전 */
+/* 바깥 배경 : 중앙은 살짝 밝고, 외곽은 암전 */
 body{
   height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;
   background:#000;
   background-image:
-    /* 중앙 → 외곽 어두워지는 라디얼 그라데이션 */
-    radial-gradient(circle at center,
-                    #013920 0%,       /* 모니터 가까이   */
-                    #001610 55%,
-                    #000 100%),       /* 바깥쪽은 암전   */
-    /* CRT 스캔라인 */
-    repeating-linear-gradient(rgba(0,0,0,.6) 0 4px,
-                              rgba(0,0,0,.8) 4px 8px);
+    radial-gradient(circle at center,#013920 0%,#001610 55%,#000 100%),
+    repeating-linear-gradient(rgba(0,0,0,.6) 0 4px,rgba(0,0,0,.8) 4px 8px);
   background-repeat:no-repeat;
 }
 
 /* ── 얇은 베젤 ── */
 #bezel{
-  padding:1vmin;                         /* 베젤 두께 */
+  padding:1.2vmin;                     /* 베젤 두께 */
   width:90vw;max-width:1000px;
   height:70vh;max-height:700px;
   background:#101010;
-  border-radius:36px;                    /* 둥글기 (베젤)   */
-  box-shadow:
-    0 0 60px rgba(0,0,0,.9) inset,
-    0 0 40px rgba(0,0,0,.7);
+  border-radius:36px;                  /* 베젤 둥글기 */
+  box-shadow:0 0 50px rgba(0,0,0,.8) inset,0 0 40px rgba(0,0,0,.7);
   display:flex;justify-content:center;align-items:center;
 }
 
 /* ── 실제 화면 ── */
 #monitor{
-  flex:1;                                /* padding 안쪽 전체 채움 */
+  flex:1;                              /* 베젤 안쪽 전부 채움 */
   position:relative;
-  background:var(--bg);
-  border-radius:22px;                    /* 화면 꼭지점 – 덜 둥글게 */
+  /* 위쪽은 조금 밝고 아래쪽은 깊이감 있는 짙은색 */
+  background:linear-gradient(#06412d 0%,#02170f 100%);
+  border:2px solid #0a3b29;            /* 얇은 라인으로 경계 표시 */
+  border-radius:22px;                  /* 화면 꼭지점 – 베젤보다 덜 둥글게 */
+  box-shadow:
+    0 0 40px rgba(50,255,138,.15),     /* 초록빛 흐림 */
+    inset 0 0 100px #010;              /* 내부 암부 */
   overflow:hidden;
 }
 
@@ -59,19 +56,15 @@ body{
   color:var(--green);text-shadow:0 0 4px var(--green);
 }
 
-/* 스캔라인 + 비네트 */
+/* 스캔라인 + 비네팅 */
 #screen::before{
   content:"";position:absolute;inset:0;
-  background:repeating-linear-gradient(transparent 0 2px,
-                                       rgba(0,0,0,.35) 2px 3px);
+  background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px);
   mix-blend-mode:overlay;pointer-events:none;
 }
 #screen::after{
   content:"";position:absolute;inset:0;
-  background:radial-gradient(ellipse at center,
-                             transparent 0%,
-                             transparent 63%,
-                             rgba(0,0,0,.48) 100%);
+  background:radial-gradient(ellipse at center,transparent 0%,transparent 63%,rgba(0,0,0,.48) 100%);
   pointer-events:none;
 }
 
