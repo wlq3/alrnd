@@ -7,30 +7,48 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 :root{
-  --green:#32ff8a;   /* 네온 글자색  */
-  --bg:#031c11;      /* 중앙 화면색 */
+  --green:#32ff8a;    /* 네온 글자색   */
+  --bg:#031c11;       /* 실제 화면색   */
 }
 /* 공통 */
 *{margin:0;padding:0;box-sizing:border-box;
   font-family:'Press Start 2P',Courier,monospace;
   user-select:none;-webkit-user-select:none;-ms-user-select:none;}
+/* 몸통 : 중앙 근처는 살짝 밝고, 가장자리는 암전 */
 body{
   height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;
   background:#000;
-  /* CRT 스캔라인 */
-  background-image:repeating-linear-gradient(rgba(0,0,0,.6) 0 4px,rgba(0,0,0,.8) 4px 8px);
+  background-image:
+    /* 중앙 → 외곽 어두워지는 라디얼 그라데이션 */
+    radial-gradient(circle at center,
+                    #013920 0%,       /* 모니터 가까이   */
+                    #001610 55%,
+                    #000 100%),       /* 바깥쪽은 암전   */
+    /* CRT 스캔라인 */
+    repeating-linear-gradient(rgba(0,0,0,.6) 0 4px,
+                              rgba(0,0,0,.8) 4px 8px);
+  background-repeat:no-repeat;
 }
 
-/* ── 화면 (베젤 없음, 네 모서리 모두 그라데이션) ── */
+/* ── 얇은 베젤 ── */
+#bezel{
+  padding:1vmin;                         /* 베젤 두께 */
+  width:90vw;max-width:1000px;
+  height:70vh;max-height:700px;
+  background:#101010;
+  border-radius:36px;                    /* 둥글기 (베젤)   */
+  box-shadow:
+    0 0 60px rgba(0,0,0,.9) inset,
+    0 0 40px rgba(0,0,0,.7);
+  display:flex;justify-content:center;align-items:center;
+}
+
+/* ── 실제 화면 ── */
 #monitor{
-  width:90vw;max-width:1000px;height:70vh;max-height:700px;
+  flex:1;                                /* padding 안쪽 전체 채움 */
   position:relative;
-  border-radius:50px;               /* 부드러운 모서리 */
-  /* 중앙은 화면색, 모서리까지 자연스럽게 투명 → body 배경과 이어짐 */
-  background:radial-gradient(circle at center,
-              var(--bg) 0%,
-              var(--bg) 70%,
-              transparent 100%);
+  background:var(--bg);
+  border-radius:22px;                    /* 화면 꼭지점 – 덜 둥글게 */
   overflow:hidden;
 }
 
@@ -41,15 +59,19 @@ body{
   color:var(--green);text-shadow:0 0 4px var(--green);
 }
 
-/* 스캔라인 + 비네팅 */
+/* 스캔라인 + 비네트 */
 #screen::before{
   content:"";position:absolute;inset:0;
-  background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px);
+  background:repeating-linear-gradient(transparent 0 2px,
+                                       rgba(0,0,0,.35) 2px 3px);
   mix-blend-mode:overlay;pointer-events:none;
 }
 #screen::after{
   content:"";position:absolute;inset:0;
-  background:radial-gradient(ellipse at center,transparent 0%,transparent 63%,rgba(0,0,0,.48) 100%);
+  background:radial-gradient(ellipse at center,
+                             transparent 0%,
+                             transparent 63%,
+                             rgba(0,0,0,.48) 100%);
   pointer-events:none;
 }
 
@@ -61,7 +83,7 @@ body{
 }
 @keyframes noise{to{transform:translate(50%,50%);}}
 
-/* 텍스트 · 입력 · 메시지 */
+/* 입력·메시지 */
 h2{font-size:1.9vmin;margin-bottom:3vmin;}
 #typed{width:360px;max-width:60%;padding:6px 0;border-bottom:1px solid var(--green);
   font-size:2vmin;min-height:38px;text-align:center;letter-spacing:2px;}
@@ -72,13 +94,15 @@ input{caret-color:transparent;}
 </head>
 <body>
 
-<div id="monitor">
-  <div id="screen">
-    <h2>ENTER THE PASSWORD</h2>
-    <div id="typed"></div>
-    <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
-    <div id="msg"></div>
-    <div id="noise"></div>
+<div id="bezel">
+  <div id="monitor">
+    <div id="screen">
+      <h2>ENTER THE PASSWORD</h2>
+      <div id="typed"></div>
+      <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
+      <div id="msg"></div>
+      <div id="noise"></div>
+    </div>
   </div>
 </div>
 
@@ -87,7 +111,7 @@ const PASS="LETMEIN";
 let buf="", ambienceStarted=false;
 let ctx;const AC=()=>ctx||(ctx=new(window.AudioContext||window.webkitAudioContext)());
 
-/* 합격·불합격 효과음 */
+/* 엔터·오류 효과음 */
 function tone(f,t){const a=AC(),o=a.createOscillator(),g=a.createGain();
 o.type=t;o.frequency.value=f;g.gain.value=.12;o.connect(g).connect(a.destination);
 o.start();g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+.35);o.stop(a.currentTime+.36);}
@@ -95,10 +119,10 @@ o.start();g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+.35);o.stop(a
 /* 레트로 키보드 클릭음 */
 function keyClick(low=false){const a=AC(),o=a.createOscillator(),g=a.createGain();
 o.type="square";o.frequency.value=low?180:820+(Math.random()*60-30);g.gain.value=.08;
-o.connect(g).connect(a.destination);o.start();g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+.04);
-o.stop(a.currentTime+.05);}
+o.connect(g).connect(a.destination);o.start();
+g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+.04);o.stop(a.currentTime+.05);}
 
-/* 배경 Hum + 화이트노이즈 */
+/* 배경 Hum + 화이트 노이즈 */
 function startAmbience(){if(ambienceStarted)return;ambienceStarted=true;const a=AC();
 const h=a.createOscillator(),hg=a.createGain();h.type="sine";h.frequency.value=50;hg.gain.value=.02;
 h.connect(hg).connect(a.destination);h.start();
