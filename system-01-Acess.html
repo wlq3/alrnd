@@ -23,8 +23,14 @@ body{
 
 /* ── 둥근 베젤 ── */
 #cabinet{
-  width:90vw;max-width:1000px;height:70vh;max-height:700px;background:#111;
-  border-radius:80px;box-shadow:0 0 40px #000 inset,0 0 60px #000;
+  width:90vw;max-width:1000px;height:70vh;max-height:700px;
+  background:radial-gradient(circle at center,
+              #2b2b2b 0%, 
+              #191919 40%,
+              #0d0d0d 75%, 
+              #000 100%);
+  border-radius:80px;
+  box-shadow:0 0 40px #000 inset,0 0 60px #000;   /* 기존 그림자 유지 */
   display:flex;justify-content:center;align-items:center;
 }
 
