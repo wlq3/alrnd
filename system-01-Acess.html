@@ -7,36 +7,41 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 :root{
-  --green:#32ff8a;       /* 텍스트 네온색 */
-  --bg:#031c11;          /* 중앙 화면색 */
+  --green:#32ff8a;   /* 네온 글자색  */
+  --bg:#031c11;      /* 중앙 화면색 */
 }
-/* 기본 설정 */
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Press Start 2P',Courier,monospace;
+/* 공통 */
+*{margin:0;padding:0;box-sizing:border-box;
+  font-family:'Press Start 2P',Courier,monospace;
   user-select:none;-webkit-user-select:none;-ms-user-select:none;}
 body{
   height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;
-  background:#000;  /* 외곽 암전 */
+  background:#000;
   /* CRT 스캔라인 */
   background-image:repeating-linear-gradient(rgba(0,0,0,.6) 0 4px,rgba(0,0,0,.8) 4px 8px);
 }
-/* ── 화면 전체(베젤 제거, 배경과 자연스러운 그라데이션) ── */
+
+/* ── 화면 (베젤 없음, 네 모서리 모두 그라데이션) ── */
 #monitor{
   width:90vw;max-width:1000px;height:70vh;max-height:700px;
   position:relative;
-  /* 중앙은 화면색, 가장자리는 투명 → body 배경과 자연스러운 연결 */
+  border-radius:50px;               /* 부드러운 모서리 */
+  /* 중앙은 화면색, 모서리까지 자연스럽게 투명 → body 배경과 이어짐 */
   background:radial-gradient(circle at center,
               var(--bg) 0%,
-              var(--bg) 60%,
+              var(--bg) 70%,
               transparent 100%);
   overflow:hidden;
 }
-/* ── 실제 텍스트/그래픽 표시 영역 ── */
+
+/* ── 텍스트 영역 ── */
 #screen{
   position:absolute;inset:0;
   display:flex;flex-direction:column;justify-content:center;align-items:center;
   color:var(--green);text-shadow:0 0 4px var(--green);
 }
-/* 스캔라인 & 비네팅 */
+
+/* 스캔라인 + 비네팅 */
 #screen::before{
   content:"";position:absolute;inset:0;
   background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px);
@@ -47,7 +52,8 @@ body{
   background:radial-gradient(ellipse at center,transparent 0%,transparent 63%,rgba(0,0,0,.48) 100%);
   pointer-events:none;
 }
-/* 랜덤 화이트 노이즈 */
+
+/* 랜덤 노이즈 */
 #noise{
   position:absolute;inset:-35%;
   background:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCI+PGZpbHRlciBpZD0iej48ZmVGcnVjdGFsTm9pc2UgdHlwZT0idHVyYnVsZW5jZSIgYmFzZUZyZXF1ZW5jeT0iLjkiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsdGVyPSJ1cmwoI3opIiBmaWxsPSIjRkZGIi8+PC9zdmc+");
@@ -55,7 +61,7 @@ body{
 }
 @keyframes noise{to{transform:translate(50%,50%);}}
 
-/* 텍스트·입력·메시지 */
+/* 텍스트 · 입력 · 메시지 */
 h2{font-size:1.9vmin;margin-bottom:3vmin;}
 #typed{width:360px;max-width:60%;padding:6px 0;border-bottom:1px solid var(--green);
   font-size:2vmin;min-height:38px;text-align:center;letter-spacing:2px;}
@@ -77,7 +83,7 @@ input{caret-color:transparent;}
 </div>
 
 <script>
-const PASS = "LETMEIN";
+const PASS="LETMEIN";
 let buf="", ambienceStarted=false;
 let ctx;const AC=()=>ctx||(ctx=new(window.AudioContext||window.webkitAudioContext)());
 
