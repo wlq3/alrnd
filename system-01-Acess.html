@@ -6,104 +6,158 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-:root{
-  --green:#2cf891;         /* 글씨 형광 그린 */
-  --shell-dark:#020704;    /* 하우징 최어두움 */
-  --shell-mid:#0a1b12;     /* 하우징 기본 */
-  --shell-hi:#152b1e;      /* 위쪽 약간 밝음 */
-}
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Press Start 2P',monospace;
+:root{--green:#32ff8a;--bg:#031c11;}
+*{margin:0;padding:0;box-sizing:border-box;
+  font-family:'Press Start 2P',Courier,monospace;
+/* 드래그 차단 */
   user-select:none;-webkit-user-select:none;-ms-user-select:none;}
-html,body{height:100%;background:#000;display:flex;justify-content:center;align-items:center;}
-
-/* ── 외곽 하우징 ── */
-.shell{
-  position:relative;width:920px;height:620px;border-radius:38px;
-  padding:34px 36px 130px;
-  /* 중앙 원형 그라데이션 삭제 → 상-하 살짝 명암만 */
-  background:linear-gradient(180deg,var(--shell-hi) 0%,var(--shell-mid) 60%,var(--shell-dark) 100%);
-  box-shadow:0 18px 45px rgba(0,0,0,.9);
-}
-/* 소프트 모서리용 흐림 */
-.shell::after{
-  content:"";position:absolute;inset:-1px;border-radius:inherit;
-  box-shadow:0 0 60px 22px #000 inset;
-  filter:blur(2.5px);pointer-events:none;
+body{
+  height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;
+  background:#000;
+/* 고정 CRT 무늬(배경 전체) */
+  background-image:
+    repeating-linear-gradient(
+      rgba(0,0,0,.6) 0 4px,
+      rgba(0,0,0,.8) 4px 8px);
 }
 
-/* 장식 */
-.vent{position:absolute;bottom:62px;left:50%;transform:translateX(-50%);
-  width:360px;height:34px;border-radius:4px;
-  background:repeating-linear-gradient(to right,transparent 0 11px,#000 11px 21px);opacity:.35;}
-.power{position:absolute;right:60px;bottom:54px;width:60px;height:60px;
-  background:#ff8a3a;border-radius:8px;
-  box-shadow:inset 0 0 8px rgba(255,255,255,.18),0 0 16px rgba(255,120,40,.5);}
+/* ── 둥근 베젤 ── */
+#cabinet{
+  width:90vw;max-width:1000px;height:70vh;max-height:700px;background:#111;
+  border-radius:80px;box-shadow:0 0 40px #000 inset,0 0 60px #000;
+  display:flex;justify-content:center;align-items:center;
+}
 
-/* 베젤 */
-.bezel{width:100%;height:100%;border-radius:22px;overflow:hidden;
-  background:#070d07;box-shadow:inset 0 0 90px #000;}
+/* ── 유리판 ── */
+#monitor{
+  position:relative;width:97%;height:92%;background:var(--bg);
+  border-radius:50px;box-shadow:inset 0 0 140px #010;overflow:hidden;
+}
 
-/* CRT 화면 */
-#screen{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
-  color:var(--green);text-shadow:0 0 6px var(--green);background:#021208;}
+/* ── 화면 ── */
+#screen{
+  position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  color:var(--green);text-shadow:0 0 4px var(--green);
+}
+
+/* 스캔라인 + 비네팅 */
 #screen::before{content:"";position:absolute;inset:0;
-  background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px);}
+  background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.35) 2px 3px);
+  mix-blend-mode:overlay;pointer-events:none;}
 #screen::after{content:"";position:absolute;inset:0;
-  background:radial-gradient(ellipse at center,transparent 0,transparent 70%,rgba(0,0,0,.55) 100%);}
+  background:radial-gradient(ellipse at center,transparent 0%,transparent 63%,rgba(0,0,0,.48) 100%);
+  pointer-events:none;}
 
-/* UI 텍스트 */
-h2{font-size:1.6vmin;margin-bottom:40px;letter-spacing:2px;}
-#typed{width:380px;max-width:70%;padding:5px 0;border-bottom:1px solid var(--green);
-  font-size:1.9vmin;min-height:36px;text-align:center;letter-spacing:2px;}
-#msg{margin-top:38px;font-size:1.8vmin;min-height:28px;color:#f44;}
+/* 노이즈 */
+#noise{
+  position:absolute;inset:-35%;
+  background:url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCI+PGZpbHRlciBpZD0iej48ZmVGcnVjdGFsTm9pc2UgdHlwZT0idHVyYnVsZW5jZSIgYmFzZUZyZXF1ZW5jeT0iLjkiLz48L2ZpbHRlcj48cmVjdCB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgZmlsdGVyPSJ1cmwoI3opIiBmaWxsPSIjRkZGIi8+PC9zdmc+");
+  opacity:.05;animation:noise 1s steps(5) infinite;pointer-events:none;}
+@keyframes noise{to{transform:translate(50%,50%);}}
+
+/* 입력/메시지 */
+h2{font-size:1.9vmin;margin-bottom:3vmin;}
+#typed{width:360px;max-width:60%;padding:6px 0;border-bottom:1px solid var(--green);
+  font-size:2vmin;min-height:38px;text-align:center;letter-spacing:2px;}
+#msg{margin-top:30px;font-size:2vmin;min-height:28px;color:#f44;}
 @keyframes glitch{0%,100%{transform:none;}50%{transform:translate(1px,-1px);}}
 
-/* 커서 숨김 */
+/* 노커서 깜빡임 제거 – caret 숨김 */
 input{caret-color:transparent;}
 </style>
 </head>
 <body>
 
-<div class="shell">
-  <div class="vent"></div>
-  <div class="power"></div>
-
-  <div class="bezel">
+<div id="cabinet">
+  <div id="monitor">
     <div id="screen">
-      <h2>ENTER THE PASSWORD</h2>
+      <h2>ENTER THE PASSWORD</h2>
       <div id="typed"></div>
-      <input id="hide" autocomplete="off" style="position:absolute;left:-9999px">
+      <input id="hidden" autocomplete="off" style="position:absolute;left:-9999px">
       <div id="msg"></div>
+      <div id="noise"></div>
     </div>
   </div>
 </div>
 
 <script>
-const PASS="LETMEIN";let buf="",amb=false;
-let ctx;const AC=()=>ctx||(ctx=new(window.AudioContext||window.webkitAudioContext));
-function tone(f,t){const ac=AC(),o=ac.createOscillator(),g=ac.createGain();
-  o.type=t;o.frequency.value=f;g.gain.value=.12;o.connect(g).connect(ac.destination);
-  o.start();g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.35);o.stop(ac.currentTime+.36);}
-function ambience(){if(amb)return;amb=true;
-  const ac=AC(),hum=ac.createOscillator(),g=ac.createGain();
-  hum.type="sine";hum.frequency.value=50;g.gain.value=.025;hum.connect(g).connect(ac.destination);hum.start();}
-const typed=document.getElementById("typed"),msg=document.getElementById("msg");
-window.addEventListener("keydown",e=>{
-  ambience();
-  if(e.key==="Backspace"){e.preventDefault();buf=buf.slice(0,-1);typed.textContent=buf;return;}
-  if(e.key==="Enter"){e.preventDefault();check();return;}
-  if(e.key.length===1&&buf.length<PASS.length){buf+=e.key.toUpperCase();typed.textContent=buf;}
+const PASS = "LETMEIN";
+let buf = "", ambienceStarted = false;   /* 불린 변수 이름 변경 */
+
+let ctx;
+const AC = () => ctx || (ctx = new (window.AudioContext || window.webkitAudioContext));
+
+function tone(freq, type){
+  const ac = AC(), osc = ac.createOscillator(), g = ac.createGain();
+  osc.type = type; osc.frequency.value = freq; g.gain.value = .12;
+  osc.connect(g).connect(ac.destination);
+  osc.start();
+  g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + .35);
+  osc.stop(ac.currentTime + .36);
+}
+
+/* 배경 Hum + 화이트노이즈 */
+function startAmbience(){
+  if (ambienceStarted) return;
+  ambienceStarted = true;
+  const ac = AC();
+
+  // Hum
+  const hum = ac.createOscillator(), hg = ac.createGain();
+  hum.type = "sine"; hum.frequency.value = 50; hg.gain.value = .02;
+  hum.connect(hg).connect(ac.destination); hum.start();
+
+  // White noise
+  const size = ac.sampleRate * 2,
+        bufN = ac.createBuffer(1, size, ac.sampleRate),
+        data = bufN.getChannelData(0);
+  for (let i = 0; i < size; i++) data[i] = Math.random() * 2 - 1;
+  const noise = ac.createBufferSource(), ng = ac.createGain();
+  noise.buffer = bufN; noise.loop = true; ng.gain.value = .015;
+  noise.connect(ng).connect(ac.destination); noise.start();
+}
+
+const typed = document.getElementById("typed"),
+      msg   = document.getElementById("msg");
+
+document.addEventListener("keydown", (e) => {
+  startAmbience();
+  const k = e.key;
+
+  if (k === "Backspace") {
+    e.preventDefault();
+    buf = buf.slice(0, -1); typed.textContent = buf;
+    return;
+  }
+
+  if (k === "Enter") {
+    e.preventDefault();
+    check();
+    return;
+  }
+
+  if (k.length === 1 && buf.length < PASS.length) {
+    buf += k.toUpperCase();
+    typed.textContent = buf;
+  }
 });
+
 function check(){
-  if(buf===PASS){
-    msg.style.color="var(--green)";msg.textContent="ACCESS GRANTED";tone(440,"triangle");
-    setTimeout(()=>location.href="system-01-Acess.html",1400);
-  }else{
-    msg.style.color="#f44";msg.textContent="ACCESS DENIED";tone(120,"sawtooth");
-    const sc=document.getElementById("screen");sc.style.animation="glitch .35s 2";
-    setTimeout(()=>sc.style.animation="none",700);buf="";typed.textContent="";
+  if (buf === PASS){
+    msg.style.color = "var(--green)";
+    msg.textContent = "ACCESS GRANTED";
+    tone(440, "triangle");
+    setTimeout(()=>location.href="system-01-Acess.html", 1400);
+  } else {
+    msg.style.color = "#f44";
+    msg.textContent = "ACCESS DENIED";
+    tone(120, "sawtooth");
+    document.getElementById("screen").style.animation = "glitch .35s 2";
+    setTimeout(()=>document.getElementById("screen").style.animation = "none", 700);
+    buf = ""; typed.textContent = "";
   }
 }
 </script>
+
 </body>
 </html>
